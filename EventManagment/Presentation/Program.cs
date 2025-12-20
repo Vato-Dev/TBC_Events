@@ -1,9 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
+using Persistence.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+DomainToEntityMappings.ConfigureMappings();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
