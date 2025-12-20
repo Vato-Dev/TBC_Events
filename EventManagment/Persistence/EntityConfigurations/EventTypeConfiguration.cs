@@ -1,13 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Persistence.Models;
+using Persistence.Entities;
 
 namespace Persistence.EntityConfigurations;
 
-public class EventTypeConfiguration : IEntityTypeConfiguration<EventType>
+public class EventTypeConfiguration : IEntityTypeConfiguration<EventTypeEntity>
 {
-    public void Configure(EntityTypeBuilder<EventType> builder)
+    
+    public void Configure(EntityTypeBuilder<EventTypeEntity> builder)
     {
+        builder.ToTable("EventTypes");
+
         builder.HasKey(e => e.Id).HasName("PK__EventTyp__3214EC0726DF4889");
 
         builder.HasIndex(e => e.Name, "UQ__EventTyp__737584F6755CCC5F").IsUnique();

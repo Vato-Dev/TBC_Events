@@ -1,13 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Persistence.Models;
+using Persistence.Entities;
 
 namespace Persistence.EntityConfigurations;
 
-public class UserConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
 {
-    public void Configure(EntityTypeBuilder<User> builder)
+    public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
+        builder.ToTable("Users");
+
         builder.HasKey(e => e.Id).HasName("PK__Users__3214EC07F44ED148");
 
         builder.HasIndex(e => e.Email, "UQ_Users_Email").IsUnique();
@@ -19,7 +21,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.FullName).HasMaxLength(200);
         builder.Property(e => e.IsActive).HasDefaultValue(true);
 
-        builder.HasOne(d => d.Role).WithMany(p => p.Users)
+        builder.HasOne(d => d.RoleEntity).WithMany(p => p.Users)
             .HasForeignKey(d => d.RoleId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK__Users__RoleId__44FF419A");    }

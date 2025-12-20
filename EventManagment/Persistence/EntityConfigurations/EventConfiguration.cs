@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Persistence.Models;
+using Persistence.Entities;
 
 namespace Persistence.EntityConfigurations;
 
-public class EventConfiguration : IEntityTypeConfiguration<Event>
+public class EventConfiguration : IEntityTypeConfiguration<EventEntity>
 {
-    public void Configure(EntityTypeBuilder<Event> builder)
+    public void Configure(EntityTypeBuilder<EventEntity> builder)
     {
+        builder.ToTable("Events");
         builder.HasKey(e => e.Id).HasName("PK__Events__3214EC07C821D3B6");
 
         builder.HasIndex(e => new { e.EventTypeId, e.StartDateTime, e.IsActive }, "IX_Events_EventTypeId_StartDateTime_IsActive");
@@ -27,7 +28,7 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK__Events__CreatedB__4D94879B");
 
-        builder.HasOne(d => d.EventType).WithMany(p => p.Events)
+        builder.HasOne(d => d.EventTypeEntity).WithMany(p => p.Events)
             .HasForeignKey(d => d.EventTypeId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK__Events__EventTyp__4CA06362");
