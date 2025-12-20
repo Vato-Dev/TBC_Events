@@ -30,7 +30,6 @@ public class Event
     public int EventTypeId { get; set; }
 
     public int CreatedById { get; set; }
-    public string TestPRop { get; set; }
 
     public virtual User CreatedBy { get; set; } = null!;
 
