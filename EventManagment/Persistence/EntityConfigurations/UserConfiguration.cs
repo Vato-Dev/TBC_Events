@@ -1,3 +1,4 @@
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Persistence.Entities;
@@ -8,7 +9,7 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
-        builder.ToTable("Users");
+        builder.ToTable("DomainUsers");
 
         builder.HasKey(e => e.Id).HasName("PK__Users__3214EC07F44ED148");
 
@@ -21,8 +22,14 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         builder.Property(e => e.FullName).HasMaxLength(200);
         builder.Property(e => e.IsActive).HasDefaultValue(true);
 
-        builder.HasOne(d => d.RoleEntity).WithMany(p => p.Users)
-            .HasForeignKey(d => d.RoleId)
-            .OnDelete(DeleteBehavior.ClientSetNull)
-            .HasConstraintName("FK__Users__RoleId__44FF419A");    }
+        
+        builder.Property(e => e.Department).HasConversion<int>().IsRequired();
+       //     .HasConversion(to => to.ToString(), from => Enum.Parse<Department>(from, ignoreCase: true)); not safe 
+
+       builder.Property(e => e.Role).HasConversion<int>().IsRequired().HasDefaultValue(UserRole.Employee);;
+        
+        builder.HasOne(u => u.ApplicationUser)
+            .WithOne()
+            .HasForeignKey<UserEntity>(u => u.Id);
+    }
 }
