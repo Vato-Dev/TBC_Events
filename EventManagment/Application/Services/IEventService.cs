@@ -1,8 +1,8 @@
-﻿using Domain.Models;
+﻿using Application.DTOs;
 
 namespace Infrastructure.Services;
 
-public interface IEventsFiltersService
+public interface IEventService
 {
     /// <summary>
     /// Returns available filters for Events page (event types, tags, locations, registration statuses)

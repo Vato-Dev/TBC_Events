@@ -8,18 +8,18 @@ using Presentation.DTOs.ResponseModels;
 namespace Presentation.Controllers
 {
     [ApiController]
-    [Route("api/events/filters")]
-    public sealed class EventsFiltersController : ControllerBase
+    [Route("api/events")]
+    public sealed class EventController : ControllerBase
     {
-        private readonly IEventsFiltersService _filtersService;
+        private readonly IEventService _eventService;
 
-        public EventsFiltersController(IEventsFiltersService filtersService)
+        public EventController(IEventService filtersService)
         {
-            _filtersService = filtersService;
+            _eventService = filtersService;
         }
 
 
-        [HttpGet("meta")]
+        [HttpGet("filters-meta")]
         [Authorize]
         public async Task<ActionResult<EventFiltersMetaResponseDto>> GetMeta(
             CancellationToken cancellationToken)
@@ -27,7 +27,7 @@ namespace Presentation.Controllers
             // user context comes from JWT
             var userId = 1;
 
-            var meta = await _filtersService.GetFiltersMetaAsync(userId, cancellationToken);
+            var meta = await _eventService.GetFiltersMetaAsync(userId, cancellationToken);
 
             return Ok(meta.Adapt<EventFiltersMetaResponseDto>());
         }
