@@ -8,9 +8,16 @@ public static class DomainToEntityMappings
 {
     public static void ConfigureMappings()
     {
-        TypeAdapterConfig<UserEntity, User>.NewConfig();
-        TypeAdapterConfig<User, UserEntity>.NewConfig();
-
+        TypeAdapterConfig<UserEntity, User>.NewConfig()
+            .Map(d=>d.Role, s=>s.Role)
+            .Map(d => d.Events, e => e.Events)
+            .Map(d => d.Registrations, s => s.Registrations);
+        TypeAdapterConfig<User, UserEntity>.NewConfig()
+            .Map(d=>d.Role, s=>s.Role)
+            .Map(d => d.Events, e => e.Events)
+            .Map(d => d.Registrations, s => s.Registrations);
+        
+        
         TypeAdapterConfig<EventEntity, Event>.NewConfig();
         TypeAdapterConfig<Event, EventEntity>.NewConfig();
 
@@ -22,9 +29,7 @@ public static class DomainToEntityMappings
 
         TypeAdapterConfig<RegistrationStatusEntity, RegistrationStatus>.NewConfig();
         TypeAdapterConfig<RegistrationStatus, RegistrationStatusEntity>.NewConfig();
-
-        TypeAdapterConfig<RoleEntity, Role>.NewConfig();
-        TypeAdapterConfig<Role, RoleEntity>.NewConfig();
+        
 
         TypeAdapterConfig<TagEntity, Tag>.NewConfig();
         TypeAdapterConfig<Tag, TagEntity>.NewConfig();

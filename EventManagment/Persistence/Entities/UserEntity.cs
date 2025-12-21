@@ -1,4 +1,7 @@
-﻿namespace Persistence.Entities;
+﻿using Domain.Models;
+using Persistence.IdentityModels;
+
+namespace Persistence.Entities;
 
 public class UserEntity
 {
@@ -7,10 +10,10 @@ public class UserEntity
     public string Email { get; set; } = null!;
 
     public string FullName { get; set; } = null!;
-
-    public int RoleId { get; set; }
-
+    
     public bool IsActive { get; set; }
+    public UserRole Role { get; set; }
+    public Department Department { get; set; }
 
     public DateTime? CreatedAt { get; set; }
     
@@ -18,5 +21,7 @@ public class UserEntity
 
     public virtual ICollection<RegistrationEntity> Registrations { get; set; } = new List<RegistrationEntity>();
 
-    public virtual RoleEntity RoleEntity { get; set; } = null!;
+    
+    public virtual ApplicationUser ApplicationUser { get; set; } = null!;
+
 }
