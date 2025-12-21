@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Persistence.Entities;
+using Persistence.IdentityModels;
 
 namespace Persistence.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<ApplicationUser,ApplicationRole,int>
 {
     public AppDbContext()
     {
@@ -23,12 +25,10 @@ public class AppDbContext : DbContext
     public virtual DbSet<RegistrationEntity> Registrations { get; set; }
 
     public virtual DbSet<RegistrationStatusEntity> RegistrationStatuses { get; set; }
-
-    public virtual DbSet<RoleEntity> Roles { get; set; }
-
+    
     public virtual DbSet<TagEntity> Tags { get; set; }
 
-    public virtual DbSet<UserEntity> Users { get; set; }
+    public virtual DbSet<UserEntity> DomainUsers { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

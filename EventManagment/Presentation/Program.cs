@@ -1,6 +1,10 @@
+using Application.Services;
+using Infrastructure.Extensions;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
 using Persistence.Mappings;
+using Presentation.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +22,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.AddAllIdentity();
+builder.AddAllRepositories();
 
 var app = builder.Build();
 
