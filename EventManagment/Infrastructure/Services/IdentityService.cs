@@ -104,7 +104,7 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
                 $"A password reset was requested from your account. If it was not you, please change your password. If you requested this action please on this Link {uri}"
         });
 
-        await CreateTokenResponse(user);
+        await CreateTokenResponse(user); //to invalidate previous token
 
     }
     public async Task<AuthResult> NewPasswordAsync(string email, string code , string newPassword)
@@ -148,9 +148,9 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
         await userManager.UpdateSecurityStampAsync(user);
         return AuthResult.Succeed(await CreateTokenResponse(user), user.Id, UserRole.Admin);//Incorrect should be ext method with mapping or [Description] attribute and get role method
     }
-    public async Task<AuthResult> RemoveAdminRoleAsync(string assignRoleToEmail, int requesterId)
+    public async Task<AuthResult> RemoveAdminRoleAsync(string removeRoleFromEmail, int requesterId)
     {
-        var user = await userManager.FindByEmailAsync(assignRoleToEmail);
+        var user = await userManager.FindByEmailAsync(removeRoleFromEmail);
         if (user is null)
         {
             return  AuthResult.Failed([new ApplicationError("UserNotFound", "User not found" )]);
@@ -164,7 +164,7 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
         var userRoles = await userManager.GetRolesAsync(user);
         if (!userRoles.Contains(Roles.Admin))
         {
-            return AuthResult.Succeed(new TokensReponse());//Not requires error because nothing happened actually just return nothing
+            return AuthResult.Failed([new ApplicationError("AlreadyExists", "User has this organizer role")]);
         }
         
         var result = await userManager.RemoveFromRoleAsync(user, Roles.Admin);
@@ -219,7 +219,7 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
         
         if (!userRoles.Contains(Roles.Organizer))
         {
-            return AuthResult.Succeed(new TokensReponse());//Not requires error because nothing happened actually just return nothing
+            return AuthResult.Failed([new ApplicationError("AlreadyExists", "User has this organizer role")]);
         }
 
         var result = await userManager.RemoveFromRoleAsync(user, Roles.Organizer);
