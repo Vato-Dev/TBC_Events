@@ -4,9 +4,8 @@ namespace Infrastructure.Services;
 
 public interface IEventService
 {
-    /// <summary>
-    /// Returns available filters for Events page (event types, tags, locations, registration statuses)
-    /// with counts for each filter item.
-    /// </summary>
     Task<EventFiltersMeta> GetFiltersMetaAsync(int customerId, CancellationToken ct = default);
+    Task<EventsSearchResult> GetEventsAsync(int customerId, EventsSearchFilters filters, CancellationToken ct = default);
+    Task<CategoriesResult> GetCategoriesAsync(int userId, bool withCounts, CancellationToken ct);
+
 }

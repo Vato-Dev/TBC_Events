@@ -1,8 +1,9 @@
-﻿using Domain.Models;
+﻿using Application.DTOs;
 using Infrastructure.Services;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.DTOs.RequestModels;
 using Presentation.DTOs.ResponseModels;
 
 namespace Presentation.Controllers
@@ -30,6 +31,33 @@ namespace Presentation.Controllers
             var meta = await _eventService.GetFiltersMetaAsync(userId, cancellationToken);
 
             return Ok(meta.Adapt<EventFiltersMetaResponseDto>());
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult<EventsSearchResponse>> GetEvents(
+            [FromQuery] EventsSearchRequestDto query,
+            CancellationToken ct)
+        {
+            var userId = 1; // later from JWT
+
+            var filters = query.Adapt<EventsSearchFilters>();
+            var result = await _eventService.GetEventsAsync(userId, filters, ct);
+
+            return Ok(result.Adapt<EventsSearchResponse>());
+        }
+
+        [HttpGet("categories")]
+        [Authorize]
+        public async Task<ActionResult<CategoriesResponse>> GetCategories(
+            [FromQuery] bool withCounts = false,
+            CancellationToken ct = default)
+        {
+            var userId = 1; // later from JWT
+
+            var result = await _eventService.GetCategoriesAsync(userId, withCounts, ct);
+
+            return Ok(result.Adapt<CategoriesResponse>());
         }
     }
 }
