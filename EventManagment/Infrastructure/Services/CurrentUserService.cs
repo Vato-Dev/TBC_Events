@@ -30,7 +30,7 @@ public sealed class CurrentUserService : ICurrentUserService
         }
 
         UserId = int.Parse(
-            user!.FindFirstValue(ClaimTypes.NameIdentifier)!
+            user!.FindFirstValue(ClaimTypes.Sid)!
         );
 
         Roles = user!.FindAll(ClaimTypes.Role)

@@ -1,5 +1,6 @@
 using Infrastructure.Mappings;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
 using Persistence.Mappings;
@@ -8,7 +9,7 @@ using Presentation.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddScoped<IOtpService, OtpService>();
-
+builder.Services.AddHttpContextAccessor();
 
 
 
@@ -45,6 +46,11 @@ builder.AddEmailSenders();
 builder.AddAllRepositories();
 
 builder.AddAllIdentity();
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor
+                               | ForwardedHeaders.XForwardedProto
+                               | ForwardedHeaders.XForwardedHost);
 
 var app = builder.Build();
 

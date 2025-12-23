@@ -9,17 +9,15 @@ namespace Infrastructure.Services;
 
 public class TokenService(IOptions<JwtServiceOptions> options)
 {
-
     public string GenerateAccessToken(ApplicationUser user , IList<string> roles)
     {
         var signInCredentials = new SigningCredentials(options.Value.GetIssuerSigningKey(), SecurityAlgorithms.HmacSha256);
         
         var claims = new List<Claim>
         {
-            new (ClaimTypes.Sid, $"{user.Id}"),
+            new (ClaimTypes.Sid, user.Id.ToString()),
             new (ClaimTypes.NameIdentifier, user.UserName!)
         };
-        
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
@@ -32,7 +30,6 @@ public class TokenService(IOptions<JwtServiceOptions> options)
             notBefore: DateTime.UtcNow,
             expires: DateTime.UtcNow.AddMinutes(3),
             signInCredentials);
-        
         return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
     }
 }
