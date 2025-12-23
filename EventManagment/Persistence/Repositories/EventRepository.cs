@@ -1,6 +1,8 @@
 using Application.DTOs;
 using Application.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Domain.Models;
+using Mapster;
 using Persistence.Data;
 using Persistence.Entities;
 using Persistence.Mappings;

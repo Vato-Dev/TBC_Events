@@ -1,4 +1,6 @@
-﻿namespace Persistence.Entities;
+﻿using Domain.Models;
+
+namespace Persistence.Entities;
 
 public class EventEntity
 {
@@ -11,17 +13,18 @@ public class EventEntity
     public DateTime StartDateTime { get; set; }
 
     public DateTime EndDateTime { get; set; }
-
-    public string Location { get; set; } = null!;
+    
+    public DateOnly RegistrationStart { get; set; }
+    public DateOnly RegistrationEnd { get; set; }
+    public LocationEntity Location { get; set; } = null!;
 
     public int Capacity { get; set; }
-
+    public int RegisteredUsers { get; set; }
     public string? ImageUrl { get; set; }
 
     public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
-
     public DateTime UpdatedAt { get; set; }
 
     public int EventTypeId { get; set; }
@@ -35,4 +38,5 @@ public class EventEntity
     public virtual EventTypeEntity EventTypeEntity { get; set; } = null!;
 
     public virtual ICollection<RegistrationEntity> Registrations { get; set; } = new List<RegistrationEntity>();
+    public virtual ICollection<AgendaItemEntity> Agendas { get; set; } = new List<AgendaItemEntity>();
 }

@@ -125,6 +125,71 @@ namespace Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Persistence.Entities.AgendaItemEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeSpan>("Duration")
+                        .HasColumnType("time");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId", "StartTime");
+
+                    b.ToTable("AgendaItems", (string)null);
+                });
+
+            modelBuilder.Entity("Persistence.Entities.AgendaTrackEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AgendaItemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Room")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Speaker")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgendaItemId");
+
+                    b.ToTable("AgendaTracks", (string)null);
+                });
+
             modelBuilder.Entity("Persistence.Entities.EventEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -162,10 +227,14 @@ namespace Persistence.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<int>("RegisteredUsers")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("RegistrationEnd")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("RegistrationStart")
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("StartDateTime")
                         .HasColumnType("datetime2");
@@ -559,6 +628,28 @@ namespace Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Persistence.Entities.AgendaItemEntity", b =>
+                {
+                    b.HasOne("Persistence.Entities.EventEntity", "Event")
+                        .WithMany("Agendas")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.AgendaTrackEntity", b =>
+                {
+                    b.HasOne("Persistence.Entities.AgendaItemEntity", "AgendaItem")
+                        .WithMany("Tracks")
+                        .HasForeignKey("AgendaItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AgendaItem");
+                });
+
             modelBuilder.Entity("Persistence.Entities.EventEntity", b =>
                 {
                     b.HasOne("Persistence.Entities.UserEntity", "CreatedBy")
@@ -573,9 +664,67 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasConstraintName("FK__Events__EventTyp__4CA06362");
 
+                    b.OwnsOne("Persistence.Entities.LocationEntity", "Location", b1 =>
+                        {
+                            b1.Property<int>("EventEntityId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("AdditionalInformation")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("FloorNumber")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("LocationType")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("RoomNumber")
+                                .HasColumnType("int");
+
+                            b1.HasKey("EventEntityId");
+
+                            b1.ToTable("Events");
+
+                            b1.WithOwner()
+                                .HasForeignKey("EventEntityId");
+
+                            b1.OwnsOne("Domain.Models.Address", "Address", b2 =>
+                                {
+                                    b2.Property<int>("LocationEntityEventEntityId")
+                                        .HasColumnType("int");
+
+                                    b2.Property<string>("City")
+                                        .IsRequired()
+                                        .HasColumnType("nvarchar(450)");
+
+                                    b2.Property<string>("Street")
+                                        .IsRequired()
+                                        .HasColumnType("nvarchar(max)");
+
+                                    b2.Property<string>("VenueName")
+                                        .IsRequired()
+                                        .HasColumnType("nvarchar(450)");
+
+                                    b2.HasKey("LocationEntityEventEntityId");
+
+                                    b2.HasIndex("VenueName", "City");
+
+                                    b2.ToTable("Events");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("LocationEntityEventEntityId");
+                                });
+
+                            b1.Navigation("Address")
+                                .IsRequired();
+                        });
+
                     b.Navigation("CreatedBy");
 
                     b.Navigation("EventTypeEntity");
+
+                    b.Navigation("Location")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Persistence.Entities.EventTagEntity", b =>
@@ -635,8 +784,15 @@ namespace Persistence.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("Persistence.Entities.AgendaItemEntity", b =>
+                {
+                    b.Navigation("Tracks");
+                });
+
             modelBuilder.Entity("Persistence.Entities.EventEntity", b =>
                 {
+                    b.Navigation("Agendas");
+
                     b.Navigation("EventTags");
 
                     b.Navigation("Registrations");
