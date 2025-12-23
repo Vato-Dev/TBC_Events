@@ -38,7 +38,7 @@ public static class JwtConfigurationExtensions
                      },
                      OnTokenValidated = ctx =>
                      {
-                         Console.WriteLine("JWT valid for: " + ctx.Principal.Identity?.Name);
+                         Console.WriteLine("JWT valid for: " + ctx.Principal?.Identity?.Name);
                          return Task.CompletedTask;
                      }
                  };

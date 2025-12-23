@@ -18,11 +18,21 @@ public class EventConfiguration : IEntityTypeConfiguration<EventEntity>
         builder.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
         builder.Property(e => e.ImageUrl).HasMaxLength(500);
         builder.Property(e => e.IsActive).HasDefaultValue(true);
-        builder.Property(e => e.Location).HasMaxLength(200);
         builder.Property(e => e.Title).HasMaxLength(200);
         builder.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
-        
+        builder.Property(e => e.RegistrationStart)
+            .HasColumnType("date");
 
+        builder.Property(e => e.RegistrationEnd)
+            .HasColumnType("date");
+        
+        builder.OwnsOne(e=>e.Location,
+            l =>
+            {
+                l.OwnsOne(loc=>loc.Address);
+                l.OwnsOne(loc => loc.Address, 
+                    address => address.HasIndex(i=> new{ i.VenueName , i.City}));
+            });
         builder.HasOne(d => d.CreatedBy).WithMany(p => p.Events)
             .HasForeignKey(d => d.CreatedById)
             .OnDelete(DeleteBehavior.ClientSetNull)
@@ -32,6 +42,6 @@ public class EventConfiguration : IEntityTypeConfiguration<EventEntity>
             .HasForeignKey(d => d.EventTypeId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK__Events__EventTyp__4CA06362");
-        
+
     }
 }

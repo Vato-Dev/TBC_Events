@@ -1,7 +1,7 @@
 using Destructurama.Attributed;
 
 namespace Application.DTOs;
-
+//Todo replace request models from DTO folder
 public sealed record ChangePasswordRequest
 {
     public required string Email { get; init; }
