@@ -1,20 +1,34 @@
 using Application.Services;
+using Application.Services.Abstractions;
+using Application.Services.Implementations;
+using Infrastructure.models;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Data;
 using Persistence.IdentityModels;
 
 namespace Infrastructure.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddEmailWithOtpService(this IServiceCollection services)
+    {
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<ISmsSender, SmsSender>();
+        services.AddScoped<IEmailSender, EmailSender>();
+        services.AddScoped<IUserService, UserService>();
+        return services;
+    }
+
+    public static IServiceCollection AddTokenService(this IServiceCollection services)
+     =>
+        services.AddScoped(typeof(TokenService));
+    
     public static IdentityBuilder AddIdentityServices(this IServiceCollection services)
         => services.AddScoped<IIdentityService, IdentityService>()
             .AddIdentity<ApplicationUser, ApplicationRole>(DefaultSetupAction)
             .AddDefaultTokenProviders();
-    
-    
+  
     private static void DefaultSetupAction(IdentityOptions options)
     {
         options.Password = new PasswordOptions
@@ -28,8 +42,8 @@ public static class ServiceCollectionExtensions
         };
 
         options.Lockout = new LockoutOptions { AllowedForNewUsers = true, DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3), MaxFailedAccessAttempts = 3, };
-
-        options.SignIn.RequireConfirmedAccount = true;
-        options.SignIn.RequireConfirmedEmail = true;
+        
+        //options.SignIn.RequireConfirmedAccount = true;
+        //options.SignIn.RequireConfirmedEmail = true;
     }
 }
