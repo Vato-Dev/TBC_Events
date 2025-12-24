@@ -52,9 +52,9 @@ public class UsersAuthController(IUserService userService) : ControllerBase
         return BadRequest(result.Errors);
     }
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [AllowAnonymous]
     [HttpPost("send-reset-password-link")]
-    public async Task<IActionResult> SendResetPasswordCode(RoleRequest request,
+    public async Task<IActionResult> SendResetPasswordCode(ForgotPasswordLinkRequest request,
         CancellationToken cancellationToken)
     {
         await userService.ForgotPasswordAsync(request);
@@ -111,7 +111,7 @@ public class UsersAuthController(IUserService userService) : ControllerBase
         [FromBody] RoleRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await userService.RemoveAdminRoleAsync(
+        var result = await userService.RemoveAdminRoleAsync(    
             request,
             cancellationToken
         );
@@ -120,7 +120,7 @@ public class UsersAuthController(IUserService userService) : ControllerBase
             return Ok(result.Tokens);
 
         return BadRequest(result.Errors);
-    }
+    }   
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme ,Roles = Roles.Admin)]
     [HttpPut("assign-organizer")]
     public async Task<IActionResult> AssignOrganizerRole(

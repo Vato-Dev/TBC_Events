@@ -1,45 +1,61 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Presentation.Extensions;
 
 public static class JwtConfigurationExtensions
 {
-     public static IServiceCollection AddJwtBearerAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddJwtBearerAuthentication(this IServiceCollection services,IConfiguration configuration)
     {
-        services
-            .AddAuthentication("Bearer")
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidateLifetime = true,
+        services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+             {
+                 options.TokenValidationParameters = new()
+                 {
+                     RoleClaimType = "Role", 
+                     NameClaimType = "Preferred_name", 
+                     ValidateAudience = true,
+                     ValidateIssuer = true,
+                     ValidateLifetime = true,
+                     ValidateIssuerSigningKey = true,
 
-                    ValidIssuer = configuration.GetJwtIssuer(),
-                    ValidAudience = configuration.GetJwtAudience(),
-                    IssuerSigningKey = configuration.GetIssuerSigningKey(),
-                    
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
+                     ValidIssuer = configuration.GetJwtIssuer(),
+                     ValidAudience = configuration.GetJwtAudience(),
+                     IssuerSigningKey = configuration.GetIssuerSigningKey(),
 
+
+                     ClockSkew = TimeSpan.FromMinutes(3)
+                 };
+    });
         return services;
     }
 
-    public static string GetJwtIssuer(this IConfiguration configuration) =>
-        configuration.GetValueOrThrow("Authentication:Issuer");
+    public static string GetJwtIssuer(this IConfiguration configuration)
+    {
+        return configuration.GetValueOrThrow("Authentication:Issuer");
+    }
+    
+    public static string GetJwtAudience(this IConfiguration configuration)
+    {
+        return configuration.GetValueOrThrow("Authentication:Audience");
+    }
+        
+    public static string GetJwtSecretKey(this IConfiguration configuration)
+    {
+        return configuration.GetValueOrThrow("Authentication:SecretForKey");
+    }        
+    public static SecurityKey GetIssuerSigningKey(this IConfiguration configuration)
+    {
+        return new SymmetricSecurityKey(Convert.FromBase64String(configuration.GetJwtSecretKey()));
+    }
 
-    public static string GetJwtAudience(this IConfiguration configuration) =>
-        configuration.GetValueOrThrow("Authentication:Audience");
-
-    public static string GetJwtSecret(this IConfiguration configuration) =>
-        configuration.GetValueOrThrow("Authentication:SecretForKey");
-
-    public static SecurityKey GetIssuerSigningKey(this IConfiguration configuration) =>
-        new SymmetricSecurityKey(Convert.FromBase64String(configuration.GetJwtSecret()));
-
-    public static string GetValueOrThrow(this IConfiguration configuration, string key) =>
-        configuration[key]!; //?? throw new ConfigurationException($"{key} was not provided in configuration file");
+    public static string GetValueOrThrow(this IConfiguration configuration, string key)
+    {
+        return configuration[key]! ; //?? throw new ConfigurationException($"{key} was not provided in configuration file");
+    }
 }

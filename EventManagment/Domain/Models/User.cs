@@ -27,7 +27,6 @@ public enum Department
 }
 public enum UserRole
 {
-    Unknown = 0, //For CLR it can't set 1 by default from config because default is 0 , just to get rid of annoying warning
     Employee = 1,
     Organizer = 2,
     Admin = 3

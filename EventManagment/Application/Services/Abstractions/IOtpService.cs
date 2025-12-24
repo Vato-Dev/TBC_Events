@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace Infrastructure.Services;
+namespace Application.Services.Abstractions;
 
 public interface IOtpService
 {

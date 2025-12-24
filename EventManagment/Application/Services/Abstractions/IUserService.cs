@@ -9,7 +9,7 @@ public interface IUserService
     Task<bool> SendOtpCodeAsync(string phoneNumber);
     Task<RegisterResult> RegisterAsync(RegisterRequest request, CancellationToken ct);
     Task<ChangePasswordResult> ChangePasswordAsync(ChangePasswordRequest request);
-    Task ForgotPasswordAsync(RoleRequest request);
+    Task ForgotPasswordAsync(ForgotPasswordLinkRequest request);
     Task<AuthResult> ResetPasswordAsync(ResetPasswordRequest request);
     Task<AuthResult> AssignAdminRoleAsync(RoleRequest request, CancellationToken cancellationToken);
     Task<AuthResult> RemoveAdminRoleAsync(RoleRequest request, CancellationToken cancellationToken);

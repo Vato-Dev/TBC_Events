@@ -13,8 +13,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddEmailWithOtpService(this IServiceCollection services)
     {
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<ISmsSender, SmsSender>();
+     //   services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<ISmsSender, SmsSender>(); // ar sheicvala performance singleton rom gavxade daje piriqiT (wesit egac da email sender unda iyos singleton)
         services.AddScoped<IEmailSender, EmailSender>();
         services.AddScoped<IUserService, UserService>();
         return services;
@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddTokenService(this IServiceCollection services)
      =>
-        services.AddScoped(typeof(TokenService));
+        services.AddSingleton(typeof(TokenService));
     
     public static IdentityBuilder AddIdentityServices(this IServiceCollection services)
         => services.AddScoped<IIdentityService, IdentityService>()
