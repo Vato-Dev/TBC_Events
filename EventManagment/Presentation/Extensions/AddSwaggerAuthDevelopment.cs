@@ -8,7 +8,7 @@ public static class AddSwaggerAuthDevelopment
   {
     builder.Services.AddSwaggerGen(option =>
     {
-      option.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+      option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
       {
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey,
