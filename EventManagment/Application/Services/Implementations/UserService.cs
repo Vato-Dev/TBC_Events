@@ -13,51 +13,58 @@ public class UserService : IUserService
     private readonly IIdentityService _identityService;
     private readonly IUserRepository _userRepository;
     private readonly ICurrentUserService _currentUser;
+    private readonly IOtpService  _otpService;
 
     public UserService(
         IIdentityService identityService,
-        IUserRepository userRepository, ICurrentUserService currentUser)
+        IUserRepository userRepository, ICurrentUserService currentUser, IOtpService otpService)
     {
         _identityService = identityService;
         _userRepository = userRepository;
         _currentUser = currentUser;
+        _otpService = otpService;
     }
 
-    public async Task<AuthResult> AuthenticateAsync(LoginRequest request)
+    public Task<AuthResult> AuthenticateAsync(LoginRequest request)
     {
-        return await _identityService.AuthenticateAsync(request.Email, request.Password);
+        return  _identityService.AuthenticateAsync(request.Email, request.Password);
     }
 
     public async Task<RegisterResult> RegisterAsync(RegisterRequest request, CancellationToken ct)
     {
-        var registerResult = await _identityService.RegisterAsync(
-            request.Email,
-            request.Password,
-            request.UserName,
-            request.PhoneNumber,
-            request.OneTimePassword,
-            ct
-        );
-
-        if (!registerResult.Succeeded)
         {
+            var isValidToken = await _otpService.ValidateOtpAsync(request.PhoneNumber, request.OneTimePassword);
+            if (!isValidToken) return RegisterResult.InvalidOtp();
+
+            var registerResult = await _identityService.RegisterAsync(
+                request.Email,
+                request.Password,
+                request.UserName,
+                request.PhoneNumber,
+                request.OneTimePassword,
+                ct
+            );
+
+            if (!registerResult.Succeeded)
+            {
+                return registerResult;
+            }
+
+            var userEntity = new User
+            {
+                Id = registerResult.UserId!.Value,
+                Email = request.Email,
+                FullName = request.UserName,
+                Department = request.Department,
+                Role = UserRole.Employee,
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
+            };
+
+            await _userRepository.CreateUserAsync(userEntity, ct);
+
             return registerResult;
         }
-
-        var userEntity = new User
-        {
-            Id = registerResult.UserId!.Value,
-            Email = request.Email,
-            FullName = request.UserName,
-            Department = request.Department,
-            Role = UserRole.Employee,
-            CreatedAt = DateTime.UtcNow,
-            IsActive = true
-        };
-
-        await _userRepository.CreateUserAsync(userEntity, ct);
-        
-        return registerResult;
     }
 
     public async Task<ChangePasswordResult> ChangePasswordAsync(ChangePasswordRequest request)
@@ -72,9 +79,9 @@ public class UserService : IUserService
     }
 
   
-    public async Task ForgotPasswordAsync(RoleRequest request)
+    public async Task ForgotPasswordAsync(ForgotPasswordLinkRequest request)
     {
-        await _identityService.ForgotPassword(request.Email);
+        await _identityService.ForgotPassword(request.Email,request.ClientUri);
     }
 
     /// <summary>

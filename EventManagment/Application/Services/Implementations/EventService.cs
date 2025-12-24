@@ -1,25 +1,25 @@
-﻿using Application.DTOs;
+﻿
+
+using Application.Exceptions;
+using Application.DTOs;
 using Application.Repositories;
+using Application.Requests.Events;
 using Application.Services.Abstractions;
 using Domain.Models;
 using Mapster;
 
 namespace Application.Services.Implementations;
 
-public sealed class EventService(IEventRepository repository, ICurrentUserService currentUser) : IEventService
+public class EventService(IEventRepository repository , ICurrentUserService currentUser) : IEventService
 {
-
-    public async Task CreateEventAsync(CreateEventRequest request, CancellationToken ct)
+    public Task<int> CreateEventAsync(CreateEventRequest request, CancellationToken cancellationToken)
     {
-        var newEvent = request.Adapt<Event>();
-
-        newEvent.IsActive = true;
-        newEvent.CreatedAt = DateTime.UtcNow;
-        newEvent.UpdatedAt = DateTime.UtcNow;
-        newEvent.CreatedById = currentUser.UserId;
-        newEvent.EventTypeId = request.EventTypeId;
-
-        await repository.CreateEventAsync(newEvent, request.TagIds, ct);
+      var newEvent = request.Adapt<Event>();
+      newEvent.IsActive = true;
+      newEvent.CreatedAt = DateTime.UtcNow;
+      newEvent.UpdatedAt = DateTime.UtcNow;
+      newEvent.CreatedById = currentUser.UserId;
+     return repository.CreateEventAsync(newEvent,request.TagIds,cancellationToken); //to aptimize it
     }
 
     public Task<EventFiltersMeta> GetFiltersMetaAsync(int customerId, CancellationToken ct)
@@ -41,23 +41,36 @@ public sealed class EventService(IEventRepository repository, ICurrentUserServic
 
     public async Task CreateAndAddAgendaToEvent(int eventId, CreateAgendaRequest request, CancellationToken ct)
     {
-        var eventToAddAgenda = await repository.GetEventByIdAsync(eventId, ct);
+        var @event = await repository.GetEventByIdAsync(eventId, cancellationToken);
+        if (@event == null) throw new NotFoundException();
 
         var agenda = request.Adapt<AgendaItem>();
 
-        if (request.AgendaTracks is { Count: > 0 })
-        {
-            foreach (var track in request.AgendaTracks)
-            {
-                agenda.AddTrackItem(track.Adapt<AgendaTrack>());
-            }
-        }
+        @event.AddAgendaItem(agenda);
 
-        eventToAddAgenda.AddAgendaItem(agenda);
+       var result =  await repository.AddEventAgendaAsync(@event.Id, agenda, cancellationToken);
+       if(result is null) throw new NotFoundException();
+       return result.Value;
+    }
 
-        await repository.UpdateEventAsync(eventToAddAgenda, ct);
+    public async Task<int> UpdateEventAsync(UpdateEventRequest request, CancellationToken cancellationToken)
+    {
+       var result =  await repository.UpdateEventAsync(request, cancellationToken);
+       if(result is null) throw new Exception("Event not found");
+       return result.Value;
+    }
+    
+    public async Task<int> UpdateAgendaItemAsync(UpdateAgendaRequest request, CancellationToken cancellationToken)
+    { 
+        
+        var result =  await repository.UpdateAgendaItemAsync(request, cancellationToken);
+         if(result is null)
+             throw new NotFoundException();
+         return result.Value;
     }
 }
+
+
 
 public sealed record CreateAgendaRequest
 {
