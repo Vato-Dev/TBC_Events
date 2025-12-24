@@ -36,6 +36,12 @@ public class EventRepository(AppDbContext context) : IEventRepository
         throw new NotImplementedException();
     }
 
+    public Task<EventDetails?> GetEventDetailsAsync(int eventId, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
+
     public async Task<CategoriesResult> GetCategoriesAsync(
         int customerId,
         bool withCounts,

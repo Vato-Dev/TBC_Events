@@ -31,6 +31,9 @@ public sealed class EventService(IEventRepository repository, ICurrentUserServic
     public Task<CategoriesResult> GetCategoriesAsync(int customerId, bool withCounts, CancellationToken ct = default)
         => repository.GetCategoriesAsync(customerId, withCounts, ct);
 
+    public Task<EventDetails?> GetEventDetailsAsync(int eventId, CancellationToken ct) 
+        => repository.GetEventDetailsAsync(eventId, ct);
+
     public async Task CreateAndAddAgendaToEvent(int eventId, CreateAgendaRequest request, CancellationToken ct)
     {
         var eventToAddAgenda = await repository.GetEventByIdAsync(eventId, ct);
