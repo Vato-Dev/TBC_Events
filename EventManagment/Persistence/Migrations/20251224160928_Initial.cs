@@ -388,10 +388,10 @@ namespace Persistence.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LastOtpSentTime", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { 1, 0, "c6104f8c-3fe0-46f5-87d3-32c6b5752ce3", "admin@demo.com", true, null, false, null, "ADMIN@DEMO.COM", "ADMIN@DEMO.COM", "AQAAAAIAAYagAAAAEEXwNjh/cHM8TuIe4nQwj6aqktRgMFamv0A52R9W52LODdV0TMqC0mDPyvzepoQn/Q==", null, false, "b8d0818d-f3bf-428f-b2ad-121c7fd982fb", false, "admin@demo.com" },
-                    { 2, 0, "97c37233-bb96-41ac-9dc1-c0c76339c83f", "organizer@demo.com", true, null, false, null, "ORGANIZER@DEMO.COM", "ORGANIZER@DEMO.COM", "AQAAAAIAAYagAAAAEOgg/owrGvo5hFd7T8J3XskHHez2flBYU5M+e2p5tzHx0AbRyuxkwSdx9VjgDnjmIA==", null, false, "02ee173f-cc43-4c2a-8000-bd3f9732728d", false, "organizer@demo.com" },
-                    { 3, 0, "d443077e-bc3d-4946-8b99-b79fa201ff99", "employee1@demo.com", true, null, false, null, "EMPLOYEE1@DEMO.COM", "EMPLOYEE1@DEMO.COM", "AQAAAAIAAYagAAAAEEjHqwLXo0dEcJv26u5i5mGzlo4mQIou7aguIqlDupxvoRDEObE/xZapFxexoJlTRQ==", null, false, "639747a7-de46-47f4-b4cf-50684d086ca3", false, "employee1@demo.com" },
-                    { 4, 0, "c95670b8-7af5-48d2-8867-826b920657a8", "employee2@demo.com", true, null, false, null, "EMPLOYEE2@DEMO.COM", "EMPLOYEE2@DEMO.COM", "AQAAAAIAAYagAAAAEPbXObJ+p+f4NnGi4dYtYs0Dm8+rWQqTuuXguH6aPb+xHrglIKZFlPX7nFEjMAJQ6g==", null, false, "4ce2bc8d-dc6b-42b5-84ef-35ec829f2ace", false, "employee2@demo.com" }
+                    { 1, 0, "ca1b8751-a920-4346-b1fc-34c0a43b36fd", "admin@demo.com", true, null, false, null, "ADMIN@DEMO.COM", "ADMIN@DEMO.COM", "AQAAAAIAAYagAAAAEPAoOBXFAn6c/q5LNwvIeObvFe7Qnk56q4k2K73g6ZfJPV7LdMFKCgfAnO8KTxA13w==", null, false, "f3dea322-032b-456f-a541-2630b7ce883c", false, "admin@demo.com" },
+                    { 2, 0, "a54a29cc-1b48-4f9a-b5ef-b7373f5c86b5", "organizer@demo.com", true, null, false, null, "ORGANIZER@DEMO.COM", "ORGANIZER@DEMO.COM", "AQAAAAIAAYagAAAAEOd6LV5gAIWE3useD9A9VK3UXSOwX5A9+AvSUP/a1dKh6eEol8/8o8E+FsKWyPOvew==", null, false, "d747028d-c837-4f34-a9a4-408b2dfdfb59", false, "organizer@demo.com" },
+                    { 3, 0, "cbdb0696-2bc5-44a4-be07-b31f21a520e8", "employee1@demo.com", true, null, false, null, "EMPLOYEE1@DEMO.COM", "EMPLOYEE1@DEMO.COM", "AQAAAAIAAYagAAAAEK2phzUSMlW4iHsMAmFCSwdhC6acpVKXr+iuIaSoaPS3+Hq8lmoypnETYib678TCXQ==", null, false, "fd550ba5-e278-4dfe-b98e-c2ede820e53a", false, "employee1@demo.com" },
+                    { 4, 0, "06271632-a0d6-4556-ae9b-aa73622cbccb", "employee2@demo.com", true, null, false, null, "EMPLOYEE2@DEMO.COM", "EMPLOYEE2@DEMO.COM", "AQAAAAIAAYagAAAAEPlfjl2K3m/cXyAyi/2ECR39LdGeU1PHySoVCE3KceA+G/uP73Qq1+lLa8FBi+cLsQ==", null, false, "63372ba7-eaaa-450b-8f66-08ced363236a", false, "employee2@demo.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -468,6 +468,31 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "AgendaItems",
+                columns: new[] { "Id", "Description", "Duration", "EventId", "Location", "StartTime", "Title", "Type" },
+                values: new object[,]
+                {
+                    { 101, "Pick up materials and settle in.", new TimeSpan(0, 0, 15, 0, 0), 1, "Lobby", new TimeOnly(10, 0, 0), "Registration & Coffee", 5 },
+                    { 102, "DbContext, tracking, and basic mappings.", new TimeSpan(0, 0, 45, 0, 0), 1, "Room 4", new TimeOnly(10, 15, 0), "EF Core Fundamentals", 1 },
+                    { 103, "Build a small model + migrations + queries.", new TimeSpan(0, 0, 50, 0, 0), 1, "Room 4", new TimeOnly(11, 5, 0), "Hands-on Lab", 2 },
+                    { 201, "Snacks + meet the community.", new TimeSpan(0, 0, 20, 0, 0), 2, "Main Hall", new TimeOnly(17, 0, 0), "Welcome & Networking", 5 },
+                    { 202, "Short talks from multiple speakers.", new TimeSpan(0, 0, 40, 0, 0), 2, "Main Hall", new TimeOnly(17, 20, 0), "Talks: GraphQL in Production", 6 },
+                    { 203, "Bring your questions.", new TimeSpan(0, 0, 40, 0, 0), 2, "Main Hall", new TimeOnly(18, 10, 0), "Open Q&A", 6 },
+                    { 301, "Live Q&A + examples.", new TimeSpan(0, 1, 0, 0, 0), 3, "Online", new TimeOnly(16, 0, 0), "Clean Architecture Q&A", 6 },
+                    { 302, "Links and next steps.", new TimeSpan(0, 0, 30, 0, 0), 3, "Online", new TimeOnly(17, 0, 0), "Wrap-up & Resources", 7 },
+                    { 401, "Verify Docker desktop + repo clone.", new TimeSpan(0, 0, 30, 0, 0), 4, "Room 7 / Stream", new TimeOnly(9, 0, 0), "Intro + Setup", 1 },
+                    { 402, "Containers, compose, debugging.", new TimeSpan(0, 2, 0, 0, 0), 4, "Room 7 / Stream", new TimeOnly(9, 30, 0), "Hands-on Workshop", 2 },
+                    { 501, "Read plans, fix slow queries.", new TimeSpan(0, 1, 0, 0, 0), 5, "Room 3", new TimeOnly(13, 0, 0), "Query Tuning Clinic", 2 },
+                    { 502, "Index strategy and pitfalls.", new TimeSpan(0, 1, 0, 0, 0), 5, "Room 3", new TimeOnly(14, 0, 0), "Indexing Deep Dive", 1 },
+                    { 601, "xUnit, Moq, and common patterns.", new TimeSpan(0, 1, 30, 0, 0), 6, "Online", new TimeOnly(15, 0, 0), "Unit Testing Patterns", 2 },
+                    { 602, "Refactor tests + coverage improvements.", new TimeSpan(0, 1, 30, 0, 0), 6, "Online", new TimeOnly(16, 30, 0), "Hands-on Lab", 2 },
+                    { 701, "Pitch ideas and form groups.", new TimeSpan(0, 0, 30, 0, 0), 7, "Community Space", new TimeOnly(18, 0, 0), "Kickoff & Team Forming", 5 },
+                    { 702, "Ship something small.", new TimeSpan(0, 2, 30, 0, 0), 7, "Community Space", new TimeOnly(18, 30, 0), "Build Session", 5 },
+                    { 801, "Pipeline basics and environments.", new TimeSpan(0, 0, 45, 0, 0), 8, "Cloud Lab / Stream", new TimeOnly(10, 0, 0), "CI/CD Overview", 1 },
+                    { 802, "Deploy end-to-end.", new TimeSpan(0, 3, 15, 0, 0), 8, "Cloud Lab / Stream", new TimeOnly(10, 45, 0), "Deploy Walkthrough", 2 }
+                });
+
+            migrationBuilder.InsertData(
                 table: "EventTags",
                 columns: new[] { "Id", "EventId", "TagId" },
                 values: new object[,]
@@ -488,6 +513,23 @@ namespace Persistence.Migrations
                     { 4, null, 6, new DateTime(2025, 12, 10, 10, 0, 0, 0, DateTimeKind.Utc), 4, 4 },
                     { 5, null, 2, new DateTime(2025, 11, 21, 10, 0, 0, 0, DateTimeKind.Utc), 2, 3 },
                     { 6, new DateTime(2025, 8, 28, 10, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(2025, 8, 25, 10, 0, 0, 0, DateTimeKind.Utc), 3, 4 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AgendaTracks",
+                columns: new[] { "Id", "AgendaItemId", "Room", "Speaker", "Title" },
+                values: new object[,]
+                {
+                    { 1001, 103, "Room 4", "Beka Ghvaberidze", "Track A: Migrations" },
+                    { 1002, 103, "Room 4", "Giorgi Tamarashvili", "Track B: LINQ Queries" },
+                    { 2001, 202, "Main Hall", "Lasha Daushvili", "GraphQL Schema Design" },
+                    { 2002, 202, "Main Hall", "Dimitri Dondoladze", "Caching & Performance" },
+                    { 4001, 402, "Room 7 / Stream", "James Richardson", "Docker Compose & Environment Variables" },
+                    { 4002, 402, "Room 7 / Stream", "Elena Novak", "Debugging Containers in .NET" },
+                    { 6001, 601, "Online", "Lasha Daushvili", "Mocks vs Fakes" },
+                    { 6002, 602, "Online", "Beka Ghvaberidze", "Refactoring Legacy Tests" },
+                    { 8001, 802, "Cloud Lab / Stream", "Andrei Popescu", "CI/CD Pipeline Setup" },
+                    { 8002, 802, "Cloud Lab / Stream", "Natalie Wong", "Deployment & Rollback Strategies" }
                 });
 
             migrationBuilder.CreateIndex(

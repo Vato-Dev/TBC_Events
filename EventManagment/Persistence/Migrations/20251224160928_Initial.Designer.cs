@@ -12,7 +12,7 @@ using Persistence.Data;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251224040132_Initial")]
+    [Migration("20251224160928_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -185,6 +185,206 @@ namespace Persistence.Migrations
                     b.HasIndex("EventId", "StartTime");
 
                     b.ToTable("AgendaItems", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 101,
+                            Description = "Pick up materials and settle in.",
+                            Duration = new TimeSpan(0, 0, 15, 0, 0),
+                            EventId = 1,
+                            Location = "Lobby",
+                            StartTime = new TimeOnly(10, 0, 0),
+                            Title = "Registration & Coffee",
+                            Type = 5
+                        },
+                        new
+                        {
+                            Id = 102,
+                            Description = "DbContext, tracking, and basic mappings.",
+                            Duration = new TimeSpan(0, 0, 45, 0, 0),
+                            EventId = 1,
+                            Location = "Room 4",
+                            StartTime = new TimeOnly(10, 15, 0),
+                            Title = "EF Core Fundamentals",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 103,
+                            Description = "Build a small model + migrations + queries.",
+                            Duration = new TimeSpan(0, 0, 50, 0, 0),
+                            EventId = 1,
+                            Location = "Room 4",
+                            StartTime = new TimeOnly(11, 5, 0),
+                            Title = "Hands-on Lab",
+                            Type = 2
+                        },
+                        new
+                        {
+                            Id = 201,
+                            Description = "Snacks + meet the community.",
+                            Duration = new TimeSpan(0, 0, 20, 0, 0),
+                            EventId = 2,
+                            Location = "Main Hall",
+                            StartTime = new TimeOnly(17, 0, 0),
+                            Title = "Welcome & Networking",
+                            Type = 5
+                        },
+                        new
+                        {
+                            Id = 202,
+                            Description = "Short talks from multiple speakers.",
+                            Duration = new TimeSpan(0, 0, 40, 0, 0),
+                            EventId = 2,
+                            Location = "Main Hall",
+                            StartTime = new TimeOnly(17, 20, 0),
+                            Title = "Talks: GraphQL in Production",
+                            Type = 6
+                        },
+                        new
+                        {
+                            Id = 203,
+                            Description = "Bring your questions.",
+                            Duration = new TimeSpan(0, 0, 40, 0, 0),
+                            EventId = 2,
+                            Location = "Main Hall",
+                            StartTime = new TimeOnly(18, 10, 0),
+                            Title = "Open Q&A",
+                            Type = 6
+                        },
+                        new
+                        {
+                            Id = 301,
+                            Description = "Live Q&A + examples.",
+                            Duration = new TimeSpan(0, 1, 0, 0, 0),
+                            EventId = 3,
+                            Location = "Online",
+                            StartTime = new TimeOnly(16, 0, 0),
+                            Title = "Clean Architecture Q&A",
+                            Type = 6
+                        },
+                        new
+                        {
+                            Id = 302,
+                            Description = "Links and next steps.",
+                            Duration = new TimeSpan(0, 0, 30, 0, 0),
+                            EventId = 3,
+                            Location = "Online",
+                            StartTime = new TimeOnly(17, 0, 0),
+                            Title = "Wrap-up & Resources",
+                            Type = 7
+                        },
+                        new
+                        {
+                            Id = 401,
+                            Description = "Verify Docker desktop + repo clone.",
+                            Duration = new TimeSpan(0, 0, 30, 0, 0),
+                            EventId = 4,
+                            Location = "Room 7 / Stream",
+                            StartTime = new TimeOnly(9, 0, 0),
+                            Title = "Intro + Setup",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 402,
+                            Description = "Containers, compose, debugging.",
+                            Duration = new TimeSpan(0, 2, 0, 0, 0),
+                            EventId = 4,
+                            Location = "Room 7 / Stream",
+                            StartTime = new TimeOnly(9, 30, 0),
+                            Title = "Hands-on Workshop",
+                            Type = 2
+                        },
+                        new
+                        {
+                            Id = 501,
+                            Description = "Read plans, fix slow queries.",
+                            Duration = new TimeSpan(0, 1, 0, 0, 0),
+                            EventId = 5,
+                            Location = "Room 3",
+                            StartTime = new TimeOnly(13, 0, 0),
+                            Title = "Query Tuning Clinic",
+                            Type = 2
+                        },
+                        new
+                        {
+                            Id = 502,
+                            Description = "Index strategy and pitfalls.",
+                            Duration = new TimeSpan(0, 1, 0, 0, 0),
+                            EventId = 5,
+                            Location = "Room 3",
+                            StartTime = new TimeOnly(14, 0, 0),
+                            Title = "Indexing Deep Dive",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 601,
+                            Description = "xUnit, Moq, and common patterns.",
+                            Duration = new TimeSpan(0, 1, 30, 0, 0),
+                            EventId = 6,
+                            Location = "Online",
+                            StartTime = new TimeOnly(15, 0, 0),
+                            Title = "Unit Testing Patterns",
+                            Type = 2
+                        },
+                        new
+                        {
+                            Id = 602,
+                            Description = "Refactor tests + coverage improvements.",
+                            Duration = new TimeSpan(0, 1, 30, 0, 0),
+                            EventId = 6,
+                            Location = "Online",
+                            StartTime = new TimeOnly(16, 30, 0),
+                            Title = "Hands-on Lab",
+                            Type = 2
+                        },
+                        new
+                        {
+                            Id = 701,
+                            Description = "Pitch ideas and form groups.",
+                            Duration = new TimeSpan(0, 0, 30, 0, 0),
+                            EventId = 7,
+                            Location = "Community Space",
+                            StartTime = new TimeOnly(18, 0, 0),
+                            Title = "Kickoff & Team Forming",
+                            Type = 5
+                        },
+                        new
+                        {
+                            Id = 702,
+                            Description = "Ship something small.",
+                            Duration = new TimeSpan(0, 2, 30, 0, 0),
+                            EventId = 7,
+                            Location = "Community Space",
+                            StartTime = new TimeOnly(18, 30, 0),
+                            Title = "Build Session",
+                            Type = 5
+                        },
+                        new
+                        {
+                            Id = 801,
+                            Description = "Pipeline basics and environments.",
+                            Duration = new TimeSpan(0, 0, 45, 0, 0),
+                            EventId = 8,
+                            Location = "Cloud Lab / Stream",
+                            StartTime = new TimeOnly(10, 0, 0),
+                            Title = "CI/CD Overview",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 802,
+                            Description = "Deploy end-to-end.",
+                            Duration = new TimeSpan(0, 3, 15, 0, 0),
+                            EventId = 8,
+                            Location = "Cloud Lab / Stream",
+                            StartTime = new TimeOnly(10, 45, 0),
+                            Title = "Deploy Walkthrough",
+                            Type = 2
+                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.AgendaTrackEntity", b =>
@@ -213,6 +413,88 @@ namespace Persistence.Migrations
                     b.HasIndex("AgendaItemId");
 
                     b.ToTable("AgendaTracks", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1001,
+                            AgendaItemId = 103,
+                            Room = "Room 4",
+                            Speaker = "Beka Ghvaberidze",
+                            Title = "Track A: Migrations"
+                        },
+                        new
+                        {
+                            Id = 1002,
+                            AgendaItemId = 103,
+                            Room = "Room 4",
+                            Speaker = "Giorgi Tamarashvili",
+                            Title = "Track B: LINQ Queries"
+                        },
+                        new
+                        {
+                            Id = 2001,
+                            AgendaItemId = 202,
+                            Room = "Main Hall",
+                            Speaker = "Lasha Daushvili",
+                            Title = "GraphQL Schema Design"
+                        },
+                        new
+                        {
+                            Id = 2002,
+                            AgendaItemId = 202,
+                            Room = "Main Hall",
+                            Speaker = "Dimitri Dondoladze",
+                            Title = "Caching & Performance"
+                        },
+                        new
+                        {
+                            Id = 4001,
+                            AgendaItemId = 402,
+                            Room = "Room 7 / Stream",
+                            Speaker = "James Richardson",
+                            Title = "Docker Compose & Environment Variables"
+                        },
+                        new
+                        {
+                            Id = 4002,
+                            AgendaItemId = 402,
+                            Room = "Room 7 / Stream",
+                            Speaker = "Elena Novak",
+                            Title = "Debugging Containers in .NET"
+                        },
+                        new
+                        {
+                            Id = 6001,
+                            AgendaItemId = 601,
+                            Room = "Online",
+                            Speaker = "Lasha Daushvili",
+                            Title = "Mocks vs Fakes"
+                        },
+                        new
+                        {
+                            Id = 6002,
+                            AgendaItemId = 602,
+                            Room = "Online",
+                            Speaker = "Beka Ghvaberidze",
+                            Title = "Refactoring Legacy Tests"
+                        },
+                        new
+                        {
+                            Id = 8001,
+                            AgendaItemId = 802,
+                            Room = "Cloud Lab / Stream",
+                            Speaker = "Andrei Popescu",
+                            Title = "CI/CD Pipeline Setup"
+                        },
+                        new
+                        {
+                            Id = 8002,
+                            AgendaItemId = 802,
+                            Room = "Cloud Lab / Stream",
+                            Speaker = "Natalie Wong",
+                            Title = "Deployment & Rollback Strategies"
+                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.EventEntity", b =>
@@ -961,15 +1243,15 @@ namespace Persistence.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c6104f8c-3fe0-46f5-87d3-32c6b5752ce3",
+                            ConcurrencyStamp = "ca1b8751-a920-4346-b1fc-34c0a43b36fd",
                             Email = "admin@demo.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@DEMO.COM",
                             NormalizedUserName = "ADMIN@DEMO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEXwNjh/cHM8TuIe4nQwj6aqktRgMFamv0A52R9W52LODdV0TMqC0mDPyvzepoQn/Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPAoOBXFAn6c/q5LNwvIeObvFe7Qnk56q4k2K73g6ZfJPV7LdMFKCgfAnO8KTxA13w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b8d0818d-f3bf-428f-b2ad-121c7fd982fb",
+                            SecurityStamp = "f3dea322-032b-456f-a541-2630b7ce883c",
                             TwoFactorEnabled = false,
                             UserName = "admin@demo.com"
                         },
@@ -977,15 +1259,15 @@ namespace Persistence.Migrations
                         {
                             Id = 2,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "97c37233-bb96-41ac-9dc1-c0c76339c83f",
+                            ConcurrencyStamp = "a54a29cc-1b48-4f9a-b5ef-b7373f5c86b5",
                             Email = "organizer@demo.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ORGANIZER@DEMO.COM",
                             NormalizedUserName = "ORGANIZER@DEMO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOgg/owrGvo5hFd7T8J3XskHHez2flBYU5M+e2p5tzHx0AbRyuxkwSdx9VjgDnjmIA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOd6LV5gAIWE3useD9A9VK3UXSOwX5A9+AvSUP/a1dKh6eEol8/8o8E+FsKWyPOvew==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "02ee173f-cc43-4c2a-8000-bd3f9732728d",
+                            SecurityStamp = "d747028d-c837-4f34-a9a4-408b2dfdfb59",
                             TwoFactorEnabled = false,
                             UserName = "organizer@demo.com"
                         },
@@ -993,15 +1275,15 @@ namespace Persistence.Migrations
                         {
                             Id = 3,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d443077e-bc3d-4946-8b99-b79fa201ff99",
+                            ConcurrencyStamp = "cbdb0696-2bc5-44a4-be07-b31f21a520e8",
                             Email = "employee1@demo.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "EMPLOYEE1@DEMO.COM",
                             NormalizedUserName = "EMPLOYEE1@DEMO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEjHqwLXo0dEcJv26u5i5mGzlo4mQIou7aguIqlDupxvoRDEObE/xZapFxexoJlTRQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEK2phzUSMlW4iHsMAmFCSwdhC6acpVKXr+iuIaSoaPS3+Hq8lmoypnETYib678TCXQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "639747a7-de46-47f4-b4cf-50684d086ca3",
+                            SecurityStamp = "fd550ba5-e278-4dfe-b98e-c2ede820e53a",
                             TwoFactorEnabled = false,
                             UserName = "employee1@demo.com"
                         },
@@ -1009,15 +1291,15 @@ namespace Persistence.Migrations
                         {
                             Id = 4,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c95670b8-7af5-48d2-8867-826b920657a8",
+                            ConcurrencyStamp = "06271632-a0d6-4556-ae9b-aa73622cbccb",
                             Email = "employee2@demo.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "EMPLOYEE2@DEMO.COM",
                             NormalizedUserName = "EMPLOYEE2@DEMO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPbXObJ+p+f4NnGi4dYtYs0Dm8+rWQqTuuXguH6aPb+xHrglIKZFlPX7nFEjMAJQ6g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPlfjl2K3m/cXyAyi/2ECR39LdGeU1PHySoVCE3KceA+G/uP73Qq1+lLa8FBi+cLsQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4ce2bc8d-dc6b-42b5-84ef-35ec829f2ace",
+                            SecurityStamp = "63372ba7-eaaa-450b-8f66-08ced363236a",
                             TwoFactorEnabled = false,
                             UserName = "employee2@demo.com"
                         });

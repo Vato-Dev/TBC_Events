@@ -62,14 +62,19 @@ namespace Presentation.Controllers
             return Ok(result.Adapt<CategoriesResponse>());
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{eventId:int}")]
         [ProducesResponseType(typeof(EventDetailsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(int id, CancellationToken ct)
+        public async Task<ActionResult<EventDetailsResponse>> GetById([FromRoute] int eventId, CancellationToken ct)
         {
-            var result = await _eventService.GetEventDetailsAsync(id, ct);
-            return result is null ? NotFound() : Ok(result);
+            var userId = 1;
+
+            var result = await _eventService.GetEventDetailsAsync(userId, eventId, ct);
+            return result is null
+                ? NotFound()
+                : Ok(result.Adapt<EventDetailsResponse>());
         }
+
 
     }
 }

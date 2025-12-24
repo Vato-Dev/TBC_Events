@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,7 +24,8 @@ namespace Application.DTOs
         public int RegisteredUsers { get; init; }
         public int CurrentWaitlist { get; init; }
         public bool IsActive { get; init; }
-
+        public MyStatus MyStatus { get; init; }
+        public IReadOnlyList<string> FeaturedSpeakers { get; init; } = Array.Empty<string>();
         public EventTypeDto EventType { get; init; } = null!;
         public OrganizerDto Organizer { get; init; } = null!;
         public LocationDto Location { get; init; } = null!;
@@ -74,7 +76,6 @@ namespace Application.DTOs
         public string? Description { get; init; }
         public string Type { get; init; } = null!;
         public string? Location { get; init; }
-
         public IReadOnlyList<AgendaTrackDto> Tracks { get; init; } = Array.Empty<AgendaTrackDto>();
     }
 

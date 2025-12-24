@@ -1,4 +1,5 @@
 ﻿using Application.DTOs;
+using Domain.Models;
 
 namespace Presentation.DTOs.ResponseModels
 {
@@ -12,13 +13,15 @@ namespace Presentation.DTOs.ResponseModels
         public DateTime StartDateTime { get; init; }
         public DateTime EndDateTime { get; init; }
 
-        public DateOnly RegistrationStart { get; init; }
-        public DateOnly RegistrationEnd { get; init; }
+        public DateTime RegistrationStart { get; init; }
+        public DateTime RegistrationEnd { get; init; }
 
         public int Capacity { get; init; }
         public int RegisteredUsers { get; init; }
+        public int CurrentWaitlist { get; init; }
         public bool IsActive { get; init; }
-
+        public RegistrationStatus MyStatus { get; init; }
+        public IReadOnlyList<string> FeaturedSpeakers { get; init; } = Array.Empty<string>();
         public EventTypeDto EventType { get; init; } = null!;
         public OrganizerDto Organizer { get; init; } = null!;
         public LocationDto Location { get; init; } = null!;

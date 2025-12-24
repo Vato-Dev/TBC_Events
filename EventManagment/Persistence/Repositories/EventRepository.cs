@@ -7,6 +7,7 @@ using Persistence.Data;
 using Persistence.Entities;
 using Persistence.Mappings;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace Persistence.Repositories;
 public class EventRepository(AppDbContext context) : IEventRepository
@@ -26,9 +27,109 @@ public class EventRepository(AppDbContext context) : IEventRepository
         throw new NotImplementedException();
     }
 
-    public Task<Event> GetEventByIdAsync(int id, CancellationToken cancellationToken)
+    public Task<EventDetails?> GetEventDetailsAsync(int eventId, int userId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var now = DateTime.UtcNow;
+
+        return context.Set<EventEntity>()
+        .AsNoTracking()
+            .Where(e => e.Id == eventId)
+            .Select(e => new EventDetails
+            {
+                Id = e.Id,
+                Title = e.Title,
+                Description = e.Description,
+                ImageUrl = e.ImageUrl,
+
+                StartDateTime = e.StartDateTime,
+                EndDateTime = e.EndDateTime,
+
+                // DateOnly -> DateTime (start of day)
+                RegistrationStart = e.RegistrationStart.ToDateTime(TimeOnly.MinValue),
+                RegistrationEnd = e.RegistrationEnd.ToDateTime(TimeOnly.MinValue),
+
+                Capacity = e.Capacity,
+                RegisteredUsers = e.RegisteredUsers,
+
+                CurrentWaitlist = e.Registrations.Count(r => r.StatusEntity.Name == "Waitlist"),
+
+                IsActive = e.StartDateTime < now,
+                MyStatus = EventStatusMapper.MapMyStatus(
+                    e.Registrations
+                        .Where(r => r.UserId == userId)
+                        .OrderByDescending(r => r.RegisteredAt ?? DateTime.MinValue)
+                        .Select(r => r.StatusEntity.Name)
+                        .FirstOrDefault()), 
+
+                EventType = new EventTypeDto
+                {
+                    Id = e.EventTypeEntity.Id,
+                    Name = e.EventTypeEntity.Name
+                },
+
+                Organizer = new OrganizerDto
+                {
+                    Id = e.CreatedBy.Id,
+                    FullName = e.CreatedBy.FullName,
+                    Email = e.CreatedBy.Email,
+                    Department = e.CreatedBy.Department.ToString()
+                },
+
+                Location = new LocationDto
+                {
+                    LocationType = e.Location.LocationType.ToString(),
+                    VenueName = e.Location.Address.VenueName,
+                    Street = e.Location.Address.Street,
+                    City = e.Location.Address.City,
+                    RoomNumber = e.Location.RoomNumber,
+                    FloorNumber = e.Location.FloorNumber,
+                    AdditionalInformation = e.Location.AdditionalInformation
+                },
+
+                FeaturedSpeakers = e.Agendas
+                    .SelectMany(a => a.Tracks)
+                    .Where(t => t.Speaker != null && t.Speaker != "")
+                    .Select(t => t.Speaker!)
+                    .Distinct()
+                    .OrderBy(s => s)
+                    .ToList(),
+
+                Tags = e.EventTags
+                    .Select(et => new TagDto
+                    {
+                        Id = et.TagEntity.Id,
+                        Name = et.TagEntity.Name,
+                        Category = et.TagEntity.Category
+                    })
+                    .OrderBy(t => t.Name)
+                    .ToList(),
+
+                Agenda = e.Agendas
+                    .OrderBy(a => a.StartTime)
+                    .Select(a => new AgendaItemDto
+                    {
+                        Id = a.Id,
+                        StartTime = a.StartTime,
+                        Duration = a.Duration,
+                        Title = a.Title,
+                        Description = a.Description,
+                        Type = a.Type.ToString(),
+                        Location = a.Location,
+
+                        Tracks = a.Tracks
+                            .OrderBy(t => t.Id)
+                            .Select(t => new AgendaTrackDto
+                            {
+                                Id = t.Id,
+                                Title = t.Title,
+                                Speaker = t.Speaker,
+                                Room = t.Room
+                            })
+                            .ToList()
+                    })
+                    .ToList()
+            })
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     public Task UpdateEventAsync(Event @event, CancellationToken cancellationToken)
@@ -36,7 +137,7 @@ public class EventRepository(AppDbContext context) : IEventRepository
         throw new NotImplementedException();
     }
 
-    public Task<EventDetails?> GetEventDetailsAsync(int eventId, CancellationToken ct)
+    public Task<Event> GetEventByIdAsync(int eventId, CancellationToken ct)
     {
         throw new NotImplementedException();
     }
