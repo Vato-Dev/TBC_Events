@@ -1,5 +1,5 @@
 ﻿using Application.DTOs;
-using Infrastructure.Services;
+using Application.Services.Abstractions;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

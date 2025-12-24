@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Data;
 
@@ -11,9 +12,11 @@ using Persistence.Data;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251223190633_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -125,71 +128,6 @@ namespace Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Persistence.Entities.AgendaItemEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("time");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Location")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId", "StartTime");
-
-                    b.ToTable("AgendaItems", (string)null);
-                });
-
-            modelBuilder.Entity("Persistence.Entities.AgendaTrackEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AgendaItemId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Room")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Speaker")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AgendaItemId");
-
-                    b.ToTable("AgendaTracks", (string)null);
-                });
-
             modelBuilder.Entity("Persistence.Entities.EventEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -227,14 +165,10 @@ namespace Persistence.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<int>("RegisteredUsers")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("RegistrationEnd")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly>("RegistrationStart")
-                        .HasColumnType("date");
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("StartDateTime")
                         .HasColumnType("datetime2");
@@ -260,144 +194,6 @@ namespace Persistence.Migrations
                         .HasFilter("([IsActive]=(1))");
 
                     b.ToTable("Events", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Capacity = 10,
-                            CreatedAt = new DateTime(2025, 8, 1, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Introductory workshop (past event)",
-                            EndDateTime = new DateTime(2025, 9, 10, 12, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 1,
-                            IsActive = true,
-                            RegisteredUsers = 1,
-                            RegistrationEnd = new DateOnly(2025, 9, 9),
-                            RegistrationStart = new DateOnly(2025, 8, 20),
-                            StartDateTime = new DateTime(2025, 9, 10, 10, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Past Workshop: EF Core Basics",
-                            UpdatedAt = new DateTime(2025, 9, 1, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Capacity = 30,
-                            CreatedAt = new DateTime(2025, 11, 1, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Casual networking + food",
-                            EndDateTime = new DateTime(2025, 12, 5, 13, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 2,
-                            IsActive = true,
-                            RegisteredUsers = 1,
-                            RegistrationEnd = new DateOnly(2025, 12, 4),
-                            RegistrationStart = new DateOnly(2025, 11, 15),
-                            StartDateTime = new DateTime(2025, 12, 5, 12, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Networking Lunch",
-                            UpdatedAt = new DateTime(2025, 11, 1, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Capacity = 30,
-                            CreatedAt = new DateTime(2025, 12, 1, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Outdoor team-building activity",
-                            EndDateTime = new DateTime(2026, 1, 10, 11, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 4,
-                            IsActive = true,
-                            RegisteredUsers = 0,
-                            RegistrationEnd = new DateOnly(2026, 1, 9),
-                            RegistrationStart = new DateOnly(2025, 12, 15),
-                            StartDateTime = new DateTime(2026, 1, 10, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Team Building Walk",
-                            UpdatedAt = new DateTime(2025, 12, 1, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Capacity = 100,
-                            CreatedAt = new DateTime(2025, 10, 20, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Mandatory internal training",
-                            EndDateTime = new DateTime(2025, 11, 25, 11, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 3,
-                            IsActive = true,
-                            RegisteredUsers = 1,
-                            RegistrationEnd = new DateOnly(2025, 11, 24),
-                            RegistrationStart = new DateOnly(2025, 11, 1),
-                            StartDateTime = new DateTime(2025, 11, 25, 10, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Security Awareness Training",
-                            UpdatedAt = new DateTime(2025, 10, 20, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Capacity = 30,
-                            CreatedAt = new DateTime(2026, 1, 1, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Best practices discussion",
-                            EndDateTime = new DateTime(2026, 2, 3, 13, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 1,
-                            IsActive = true,
-                            RegisteredUsers = 0,
-                            RegistrationEnd = new DateOnly(2026, 2, 2),
-                            RegistrationStart = new DateOnly(2026, 1, 10),
-                            StartDateTime = new DateTime(2026, 2, 3, 12, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Lunch & Learn: Clean Code",
-                            UpdatedAt = new DateTime(2026, 1, 1, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Capacity = 10,
-                            CreatedAt = new DateTime(2025, 11, 20, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Optional wellness session",
-                            EndDateTime = new DateTime(2025, 12, 20, 9, 30, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 2,
-                            IsActive = true,
-                            RegisteredUsers = 1,
-                            RegistrationEnd = new DateOnly(2025, 12, 19),
-                            RegistrationStart = new DateOnly(2025, 12, 1),
-                            StartDateTime = new DateTime(2025, 12, 20, 8, 30, 0, 0, DateTimeKind.Utc),
-                            Title = "Wellness Morning Yoga",
-                            UpdatedAt = new DateTime(2025, 11, 20, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Capacity = 100,
-                            CreatedAt = new DateTime(2026, 2, 1, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Upcoming features overview",
-                            EndDateTime = new DateTime(2026, 3, 5, 15, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 3,
-                            IsActive = true,
-                            RegisteredUsers = 0,
-                            RegistrationEnd = new DateOnly(2026, 3, 4),
-                            RegistrationStart = new DateOnly(2026, 2, 10),
-                            StartDateTime = new DateTime(2026, 3, 5, 14, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Product Roadmap Presentation",
-                            UpdatedAt = new DateTime(2026, 2, 1, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Capacity = 30,
-                            CreatedAt = new DateTime(2025, 9, 1, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Giving back together",
-                            EndDateTime = new DateTime(2025, 10, 15, 13, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 4,
-                            IsActive = true,
-                            RegisteredUsers = 0,
-                            RegistrationEnd = new DateOnly(2025, 10, 14),
-                            RegistrationStart = new DateOnly(2025, 9, 20),
-                            StartDateTime = new DateTime(2025, 10, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Community Volunteering Day",
-                            UpdatedAt = new DateTime(2025, 9, 1, 9, 0, 0, 0, DateTimeKind.Utc)
-                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.EventTagEntity", b =>
@@ -423,26 +219,6 @@ namespace Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("EventTags", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EventId = 1,
-                            TagId = 5
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EventId = 2,
-                            TagId = 3
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EventId = 2,
-                            TagId = 4
-                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.EventTypeEntity", b =>
@@ -474,43 +250,6 @@ namespace Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("EventTypes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "Hands-on session",
-                            IsActive = true,
-                            Name = "Workshop"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "Community meetup",
-                            IsActive = true,
-                            Name = "Meetup"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Large multi-session event",
-                            IsActive = true,
-                            Name = "Conference"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "Online session",
-                            IsActive = true,
-                            Name = "Webinar"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Description = "Internal team activity",
-                            IsActive = true,
-                            Name = "Team Building"
-                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.RegistrationEntity", b =>
@@ -552,57 +291,6 @@ namespace Persistence.Migrations
                         .HasFilter("([StatusId]>(3))");
 
                     b.ToTable("Registrations", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EventId = 1,
-                            RegisteredAt = new DateTime(2025, 9, 1, 10, 0, 0, 0, DateTimeKind.Utc),
-                            StatusId = 4,
-                            UserId = 3
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EventId = 2,
-                            RegisteredAt = new DateTime(2025, 11, 20, 10, 0, 0, 0, DateTimeKind.Utc),
-                            StatusId = 4,
-                            UserId = 4
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EventId = 4,
-                            RegisteredAt = new DateTime(2025, 11, 10, 10, 0, 0, 0, DateTimeKind.Utc),
-                            StatusId = 4,
-                            UserId = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            EventId = 6,
-                            RegisteredAt = new DateTime(2025, 12, 10, 10, 0, 0, 0, DateTimeKind.Utc),
-                            StatusId = 4,
-                            UserId = 4
-                        },
-                        new
-                        {
-                            Id = 5,
-                            EventId = 2,
-                            RegisteredAt = new DateTime(2025, 11, 21, 10, 0, 0, 0, DateTimeKind.Utc),
-                            StatusId = 2,
-                            UserId = 3
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CancelledAt = new DateTime(2025, 8, 28, 10, 0, 0, 0, DateTimeKind.Utc),
-                            EventId = 1,
-                            RegisteredAt = new DateTime(2025, 8, 25, 10, 0, 0, 0, DateTimeKind.Utc),
-                            StatusId = 3,
-                            UserId = 4
-                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.RegistrationStatusEntity", b =>
@@ -629,32 +317,6 @@ namespace Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("RegistrationStatuses", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "Awaiting approval",
-                            Name = "Pending"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "No spots currently available",
-                            Name = "Waitlisted"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Registration cancelled",
-                            Name = "Cancelled"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "Spot confirmed",
-                            Name = "Confirmed"
-                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.TagEntity", b =>
@@ -681,44 +343,6 @@ namespace Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Tags", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Category = "theme",
-                            Name = "outdoor"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Category = "theme",
-                            Name = "team-building"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Category = "perk",
-                            Name = "free-food"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Category = "theme",
-                            Name = "networking"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Category = "topic",
-                            Name = "tech"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Category = "topic",
-                            Name = "wellness"
-                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.UserEntity", b =>
@@ -764,48 +388,6 @@ namespace Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("DomainUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Department = 2,
-                            Email = "admin@demo.com",
-                            FullName = "Demo Admin",
-                            IsActive = true,
-                            Role = 3
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Department = 4,
-                            Email = "organizer@demo.com",
-                            FullName = "Demo Organizer",
-                            IsActive = true,
-                            Role = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Department = 6,
-                            Email = "employee1@demo.com",
-                            FullName = "Demo Employee 1",
-                            IsActive = true,
-                            Role = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreatedAt = new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Department = 1,
-                            Email = "employee2@demo.com",
-                            FullName = "Demo Employee 2",
-                            IsActive = true,
-                            Role = 1
-                        });
                 });
 
             modelBuilder.Entity("Persistence.IdentityModels.ApplicationRole", b =>
@@ -980,28 +562,6 @@ namespace Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Persistence.Entities.AgendaItemEntity", b =>
-                {
-                    b.HasOne("Persistence.Entities.EventEntity", "Event")
-                        .WithMany("Agendas")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-                });
-
-            modelBuilder.Entity("Persistence.Entities.AgendaTrackEntity", b =>
-                {
-                    b.HasOne("Persistence.Entities.AgendaItemEntity", "AgendaItem")
-                        .WithMany("Tracks")
-                        .HasForeignKey("AgendaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AgendaItem");
-                });
-
             modelBuilder.Entity("Persistence.Entities.EventEntity", b =>
                 {
                     b.HasOne("Persistence.Entities.UserEntity", "CreatedBy")
@@ -1016,67 +576,9 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasConstraintName("FK__Events__EventTyp__4CA06362");
 
-                    b.OwnsOne("Persistence.Entities.LocationEntity", "Location", b1 =>
-                        {
-                            b1.Property<int>("EventEntityId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("AdditionalInformation")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int>("FloorNumber")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("LocationType")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("RoomNumber")
-                                .HasColumnType("int");
-
-                            b1.HasKey("EventEntityId");
-
-                            b1.ToTable("Events");
-
-                            b1.WithOwner()
-                                .HasForeignKey("EventEntityId");
-
-                            b1.OwnsOne("Persistence.Entities.AddressEntity", "Address", b2 =>
-                                {
-                                    b2.Property<int>("LocationEntityEventEntityId")
-                                        .HasColumnType("int");
-
-                                    b2.Property<string>("City")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.Property<string>("Street")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.Property<string>("VenueName")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.HasKey("LocationEntityEventEntityId");
-
-                                    b2.HasIndex("VenueName", "City");
-
-                                    b2.ToTable("Events");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("LocationEntityEventEntityId");
-                                });
-
-                            b1.Navigation("Address")
-                                .IsRequired();
-                        });
-
                     b.Navigation("CreatedBy");
 
                     b.Navigation("EventTypeEntity");
-
-                    b.Navigation("Location")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Persistence.Entities.EventTagEntity", b =>
@@ -1136,15 +638,8 @@ namespace Persistence.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.AgendaItemEntity", b =>
-                {
-                    b.Navigation("Tracks");
-                });
-
             modelBuilder.Entity("Persistence.Entities.EventEntity", b =>
                 {
-                    b.Navigation("Agendas");
-
                     b.Navigation("EventTags");
 
                     b.Navigation("Registrations");

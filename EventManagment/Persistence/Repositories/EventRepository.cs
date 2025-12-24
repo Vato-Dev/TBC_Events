@@ -10,11 +10,38 @@ using Persistence.Mappings;
 namespace Persistence.Repositories;
 public class EventRepository(AppDbContext context) : IEventRepository
 {
+    public async Task<int> CreateEventAsync(Event @event, List<int> tagIds, CancellationToken cancellationToken)
+    {
+        /* var entity = @event.Adapt<EventEntity>();
+         foreach (var tagId in tagIds)
+         {
+              context.EventTags.Add(new EventTagEntity
+             {
+                 EventId = entity.Id,
+                 TagId = tagId
+             });
+         }
+         context.Events.Add(entity);*/
+        throw new NotImplementedException();
+    }
+
+    public Task<Event> GetEventByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task UpdateEventAsync(Event @event, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<CategoriesResult> GetCategoriesAsync(
         int customerId,
         bool withCounts,
         CancellationToken ct = default)
     {
+        var now = DateTime.UtcNow;
+
         if (!withCounts)
         {
             var categories = await context.EventTypes
@@ -39,7 +66,7 @@ public class EventRepository(AppDbContext context) : IEventRepository
             .AsNoTracking()
             .Where(c => c.IsActive)
             .GroupJoin(
-                context.Events.AsNoTracking().Where(e => e.IsActive),
+                context.Events.AsNoTracking().Where(e => e.StartDateTime >= now),
                 c => c.Id,
                 e => e.EventTypeId,
                 (c, events) => new CategoryDto
@@ -61,10 +88,11 @@ public class EventRepository(AppDbContext context) : IEventRepository
 
 
     public async Task<EventsSearchResult> GetAllAsync(
-            int customerId,
-            EventsSearchFilters filters,
-            CancellationToken ct = default)
+        int customerId,
+        EventsSearchFilters filters,
+        CancellationToken ct = default)
     {
+        var now = DateTime.UtcNow;
         // Defaults
         var page = filters.Page.GetValueOrDefault(1);
         if (page < 1) page = 1;
@@ -73,20 +101,32 @@ public class EventRepository(AppDbContext context) : IEventRepository
         if (pageSize < 1) pageSize = 20;
         if (pageSize > 200) pageSize = 200;
 
-        // Base query
         IQueryable<EventEntity> query = context.Set<EventEntity>()
             .AsNoTracking()
             .Include(e => e.EventTypeEntity)
             .Include(e => e.Registrations)
                 .ThenInclude(r => r.StatusEntity);
 
-        // IsActive filter
+        // IsActive
         if (filters.IsActive.HasValue)
         {
-            query = query.Where(e => e.IsActive == filters.IsActive.Value);
-        }
+            if (filters.IsActive.Value)
+            {
+                query = query.Where(e =>
+                    e.IsActive &&
+                    e.StartDateTime >= now
+                );
+            }
+            else
+            {
+                query = query.Where(e =>
+                    !e.IsActive ||
+                    e.StartDateTime < now
+                );
+            }
+        }        
 
-        // Search filter (Title + Description)
+        // Search
         if (!string.IsNullOrWhiteSpace(filters.Search))
         {
             var s = filters.Search.Trim();
@@ -97,44 +137,42 @@ public class EventRepository(AppDbContext context) : IEventRepository
 
         // EventTypeIds
         if (filters.EventTypeIds is { Count: > 0 })
-        {
             query = query.Where(e => filters.EventTypeIds!.Contains(e.EventTypeId));
-        }
 
-        // Locations
+        // Locations (VenueName)
         if (filters.Locations is { Count: > 0 })
         {
-            query = query.Where(e => filters.Locations!.Contains(e.Location));
+            query = query.Where(e =>
+                e.Location != null &&
+                e.Location.Address != null &&
+                e.Location.Address.VenueName != null &&
+                filters.Locations!.Contains(e.Location.Address.VenueName));
         }
 
+        // Date filters
         if (filters.From.HasValue)
         {
             var fromDate = filters.From.Value;
-            query = query.Where(e => e.StartDateTime.Date >= fromDate);
+            query = query.Where(e => e.StartDateTime >= fromDate);
         }
 
         if (filters.To.HasValue)
         {
             var toDate = filters.To.Value;
-            query = query.Where(e => e.StartDateTime.Date <= toDate);
+            query = query.Where(e => e.StartDateTime <= toDate);
         }
 
-        // CapacityAvailability (computed by remaining spots)
+        // CapacityAvailability (use RegisteredUsers)
         if (filters.CapacityAvailability is { Count: > 0 })
         {
             query = query.Where(e =>
                 filters.CapacityAvailability!.Contains(
-                    EventStatusMapper.MapCapacityAvailability(
-                        e.Capacity -
-                        e.Registrations.Count(r =>
-                            r.CancelledAt == null &&
-                            r.StatusEntity.Name == "Confirmed")
-                    )
+                    EventStatusMapper.MapCapacityAvailability(e.Capacity - e.RegisteredUsers)
                 )
             );
         }
 
-        // MyStatuses (computed for this customerId)
+        // MyStatuses (still from Registrations)
         if (filters.MyStatuses is { Count: > 0 })
         {
             query = query.Where(e =>
@@ -152,7 +190,7 @@ public class EventRepository(AppDbContext context) : IEventRepository
 
         var totalCount = await query.CountAsync(ct);
 
-        // Sorting
+        // Sorting (REGISTRATIONS -> RegisteredUsers)
         var sortBy = filters.SortBy ?? EventsSortBy.START_DATE;
         var sortDir = filters.SortDirection ?? EventSortDirection.ASC;
 
@@ -161,26 +199,15 @@ public class EventRepository(AppDbContext context) : IEventRepository
             (EventsSortBy.TITLE, EventSortDirection.ASC) => query.OrderBy(e => e.Title),
             (EventsSortBy.TITLE, EventSortDirection.DESC) => query.OrderByDescending(e => e.Title),
 
-            (EventsSortBy.REGISTRATIONS, EventSortDirection.ASC) =>
-                query.OrderBy(e =>
-                    e.Registrations.Count(r =>
-                        r.CancelledAt == null &&
-                        r.StatusEntity.Name == "Confirmed")),
-
-            (EventsSortBy.REGISTRATIONS, EventSortDirection.DESC) =>
-                query.OrderByDescending(e =>
-                    e.Registrations.Count(r =>
-                        r.CancelledAt == null &&
-                        r.StatusEntity.Name == "Confirmed")),
+            (EventsSortBy.REGISTRATIONS, EventSortDirection.ASC) => query.OrderBy(e => e.RegisteredUsers),
+            (EventsSortBy.REGISTRATIONS, EventSortDirection.DESC) => query.OrderByDescending(e => e.RegisteredUsers),
 
             (EventsSortBy.START_DATE, EventSortDirection.DESC) => query.OrderByDescending(e => e.StartDateTime),
             _ => query.OrderBy(e => e.StartDateTime),
         };
 
-        // Page slice
         query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-        // Projection to DTO
         var items = await query
             .Select(e => new EventCard
             {
@@ -188,25 +215,24 @@ public class EventRepository(AppDbContext context) : IEventRepository
                 Title = e.Title,
                 StartsAt = e.StartDateTime,
                 EndsAt = e.EndDateTime,
-                Location = e.Location,
+                ImageUrl = e.ImageUrl,
+
+                Location = e.Location != null && e.Location.Address != null
+                    ? e.Location.Address.VenueName
+                    : null,
+
                 EventTypeId = e.EventTypeId,
                 EventTypeName = e.EventTypeEntity.Name,
                 Capacity = e.Capacity,
 
-                // Remaining spots and capacity
-                SpotsLeft = e.Capacity -
-                            e.Registrations.Count(r =>
-                                r.CancelledAt == null &&
-                                r.StatusEntity.Name == "Confirmed"),
+                // use denormalized value
+                TotalRegistered = e.RegisteredUsers,
+                SpotsLeft = e.Capacity - e.RegisteredUsers,
 
                 CapacityAvailability = EventStatusMapper.MapCapacityAvailability(
-                    e.Capacity -
-                    e.Registrations.Count(r =>
-                        r.CancelledAt == null &&
-                        r.StatusEntity.Name == "Confirmed")
+                    e.Capacity - e.RegisteredUsers
                 ),
 
-                // MyStatus for current user
                 MyStatus = EventStatusMapper.MapMyStatusNullable(
                     e.Registrations
                         .Where(r => r.UserId == customerId)
@@ -229,9 +255,11 @@ public class EventRepository(AppDbContext context) : IEventRepository
 
     public async Task<EventFiltersMeta> GetFiltersMetaAsync(int userId, CancellationToken ct)
     {
+        var now = DateTime.UtcNow;
+
         IQueryable<EventEntity> activeEvents = context.Events
             .AsNoTracking()
-            .Where(e => e.IsActive);
+            .Where(e => e.StartDateTime >= now);
 
         var eventTypes = await GetEventTypesAsync(activeEvents, ct);
         var locations = await GetLocationsAsync(activeEvents, ct);
@@ -265,16 +293,25 @@ public class EventRepository(AppDbContext context) : IEventRepository
             .ToListAsync(ct);
     }
 
-    private Task<List<LookupCount>> GetLocationsAsync(IQueryable<EventEntity> activeEvents, CancellationToken ct)
+    private Task<List<LookupCount>> GetLocationsAsync(
+        IQueryable<EventEntity> activeEvents,
+        CancellationToken ct)
     {
         return activeEvents
-            .Where(e => e.Location != null && e.Location != "")
-            .GroupBy(e => e.Location)
-            .Select(g => new LookupCount(null, g.Key!, g.Count()))
+            .Where(e => e.Location != null &&
+                        e.Location.Address != null &&
+                        !string.IsNullOrWhiteSpace(e.Location.Address.VenueName))
+            .GroupBy(e => e.Location.Address.VenueName)
+            .Select(g => new LookupCount(
+                null,
+                g.Key,
+                g.Count()
+            ))
             .OrderByDescending(x => x.Count)
             .ThenBy(x => x.Name)
             .ToListAsync(ct);
     }
+
 
     private Task<List<LookupCount>> GetRegistrationStatusesAsync(IQueryable<EventEntity> activeEvents, CancellationToken ct)
     {
@@ -298,43 +335,26 @@ public class EventRepository(AppDbContext context) : IEventRepository
 
     private async Task<List<LookupCount>> GetCapacityAvailabilityAsync(IQueryable<EventEntity> activeEvents, CancellationToken ct)
     {
-        var capacities = await activeEvents
-            .Select(e => new { e.Id, Capacity = (int?)e.Capacity })
-            .ToListAsync(ct);
-
-        var takenByEvent = await context.Registrations
-            .AsNoTracking()
-            .Join(activeEvents, r => r.EventId, e => e.Id, (r, _) => r)
-            .Join(context.RegistrationStatuses.AsNoTracking(),
-                r => r.StatusId,
-                rs => rs.Id,
-                (r, rs) => new { r.EventId, StatusName = rs.Name }
-            )
-            .Where(x => x.StatusName == "Confirmed")
-            .GroupBy(x => x.EventId)
-            .Select(g => new { EventId = g.Key, Count = g.Count() })
-            .ToDictionaryAsync(x => x.EventId, x => x.Count, ct);
-
-        int available = 0, limited = 0, full = 0;
-
-        foreach (var e in capacities)
-        {
-            var capacity = e.Capacity ?? 0;
-            takenByEvent.TryGetValue(e.Id, out var taken);
-            var remaining = capacity - taken;
-
-            if (remaining > 5) available++;
-            else if (remaining >= 1) limited++;
-            else full++;
-        }
+        var result = await activeEvents
+            .Select(e => new { Remaining = e.Capacity - e.RegisteredUsers })
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                Available = g.Sum(x => x.Remaining > 5 ? 1 : 0),
+                Limited = g.Sum(x => x.Remaining >= 1 && x.Remaining <= 5 ? 1 : 0),
+                Full = g.Sum(x => x.Remaining <= 0 ? 1 : 0),
+            })
+            .SingleOrDefaultAsync(ct) ?? new { Available = 0, Limited = 0, Full = 0 };
 
         return new List<LookupCount>
         {
-            new(null, "Available Spots", available),
-            new(null, "Limited (1-5 spots)", limited),
-            new(null, "Full (Waitlist)", full),
+            new(null, "AVAILABLE", result.Available),
+            new(null, "LIMITED", result.Limited),
+            new(null, "FULL", result.Full),
         };
+
     }
+
 
     private async Task<List<LookupCount>> GetMyStatusesAsync(
         IQueryable<EventEntity> activeEvents,
