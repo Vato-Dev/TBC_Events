@@ -12,6 +12,106 @@ using Microsoft.Extensions.Logging;
 namespace Persistence.Repositories;
 public class EventRepository(AppDbContext context) : IEventRepository
 {
+    public async Task UnregisterFromEventAsync(int userId, int eventId, CancellationToken ct)
+    {
+        var cancelledStatusId = await context.RegistrationStatuses
+            .Where(x => x.Name == "Cancelled")
+            .Select(x => x.Id)
+            .SingleAsync(ct);
+
+        var existing = await context.Registrations
+            .Include(r => r.StatusEntity)
+            .FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId, ct);
+
+        if (existing is null)
+            throw new InvalidOperationException("Operation invalid: registration not found.");
+
+        var statusName = existing.StatusEntity.Name;
+
+        if (statusName == "Cancelled")
+            throw new InvalidOperationException("Operation invalid: registration already cancelled.");
+
+        if (statusName == "Waitlisted")
+        {
+            existing.StatusId = cancelledStatusId;
+            existing.CancelledAt = DateTime.UtcNow;
+
+            await context.SaveChangesAsync(ct);
+            return;
+        }
+
+        if (statusName == "Confirmed")
+        {
+            var ev = await context.Events
+                .FirstOrDefaultAsync(e => e.Id == eventId, ct);
+
+            if (ev is null)
+                throw new InvalidOperationException("Operation invalid: event not found.");
+
+            existing.StatusId = cancelledStatusId;
+            existing.CancelledAt = DateTime.UtcNow;
+
+            if (ev.RegisteredUsers > 0)
+                ev.RegisteredUsers -= 1;
+
+            await context.SaveChangesAsync(ct);
+            return;
+        }
+
+        throw new InvalidOperationException("Operation invalid: unknown registration status.");
+    }
+
+
+    public async Task RegisterOnEventAsync(int userId, int eventId, CancellationToken ct)
+    {
+        // optional: ensure event exists (recommended)
+        var eventExists = await context.Events
+            .AsNoTracking()
+            .AnyAsync(e => e.Id == eventId, ct);
+
+        if (!eventExists)
+            throw new KeyNotFoundException($"Event with id {eventId} not found.");
+
+        var registration = await context.Registrations
+            .FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId, ct);
+
+        if (registration is null)
+        {
+            // new registration -> Waitlisted
+            context.Registrations.Add(new RegistrationEntity
+            {
+                EventId = eventId,
+                UserId = userId,
+                StatusId = 2, // Waitlisted
+                RegisteredAt = DateTime.UtcNow,
+                CancelledAt = null
+            });
+
+            await context.SaveChangesAsync(ct);
+            return;
+        }
+
+        // existing registration rules
+        if (registration.StatusId == 4 || registration.StatusId == 2)
+        {
+            // Confirmed or Waitlisted -> invalid
+            throw new InvalidOperationException("Operation invalid: user is already registered or waitlisted for this event.");
+        }
+
+        if (registration.StatusId == 3)
+        {
+            // Cancelled -> set to Waitlisted
+            registration.StatusId = 2;
+            registration.RegisteredAt = DateTime.UtcNow;
+            registration.CancelledAt = null;
+
+            await context.SaveChangesAsync(ct);
+            return;
+        }
+
+        // If you ever add more statuses, you can decide what to do here.
+        throw new InvalidOperationException("Operation invalid: unsupported registration status.");
+    }
     public async Task<int> CreateEventAsync(Event @event, List<int> tagIds, CancellationToken cancellationToken)
     {
         /* var entity = @event.Adapt<EventEntity>();
@@ -27,7 +127,7 @@ public class EventRepository(AppDbContext context) : IEventRepository
         throw new NotImplementedException();
     }
 
-    public Task<EventDetails?> GetEventDetailsAsync(int eventId, int userId, CancellationToken cancellationToken)
+    public Task<EventDetails?> GetEventDetailsAsync(int userId, int eventId, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
 

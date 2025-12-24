@@ -33,6 +33,11 @@ public sealed class EventService(IEventRepository repository, ICurrentUserServic
 
     public Task<EventDetails?> GetEventDetailsAsync(int customerId, int eventId, CancellationToken ct) 
         => repository.GetEventDetailsAsync(customerId, eventId, ct);
+    public Task RegisterOnEventAsync(int customerId, int eventId, CancellationToken ct = default)
+    => repository.RegisterOnEventAsync(customerId, eventId, ct);
+
+    public Task UnregisterFromEventAsync(int customerId, int eventId, CancellationToken ct = default)
+        => repository.UnregisterFromEventAsync(customerId, eventId, ct);
 
     public async Task CreateAndAddAgendaToEvent(int eventId, CreateAgendaRequest request, CancellationToken ct)
     {

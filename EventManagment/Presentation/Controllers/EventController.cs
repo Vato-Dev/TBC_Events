@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using Application.Services.Abstractions;
 using Mapster;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.DTOs.RequestModels;
@@ -22,11 +23,10 @@ namespace Presentation.Controllers
 
 
         [HttpGet("filters-meta")]
-       // [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<EventFiltersMetaResponseDto>> GetMeta(
             CancellationToken cancellationToken)
         {
-            // user context comes from JWT
          //   var currentUser = this.User.FindFirstValue("Sid");
             var userId = 1;
 
@@ -36,7 +36,7 @@ namespace Presentation.Controllers
         }
 
         [HttpGet]
-       // [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<EventsSearchResponse>> GetEvents(
             [FromQuery] EventsSearchRequestDto query,
             CancellationToken ct)
@@ -50,7 +50,7 @@ namespace Presentation.Controllers
         }
 
         [HttpGet("categories")]
-     //   [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<CategoriesResponse>> GetCategories(
             [FromQuery] bool withCounts = false,
             CancellationToken ct = default)
@@ -63,6 +63,7 @@ namespace Presentation.Controllers
         }
 
         [HttpGet("{eventId:int}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(typeof(EventDetailsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<EventDetailsResponse>> GetById([FromRoute] int eventId, CancellationToken ct)
@@ -75,6 +76,48 @@ namespace Presentation.Controllers
                 : Ok(result.Adapt<EventDetailsResponse>());
         }
 
+        [HttpPost("{eventId:int}/registrations")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Register([FromRoute] int eventId, CancellationToken ct)
+        {
+            try
+            {
+                var currentUser = this.User.FindFirstValue("Sid");
+                var userId = 1;
 
+                await _eventService.RegisterOnEventAsync(userId, eventId, ct);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("{eventId:int}/registrations")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Unregister([FromRoute] int eventId, CancellationToken ct)
+        {
+            try
+            {
+                var currentUser = this.User.FindFirstValue("Sid");
+                var userId = 1;
+
+                await _eventService.UnregisterFromEventAsync(userId, eventId, ct);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
