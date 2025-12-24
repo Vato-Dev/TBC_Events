@@ -40,16 +40,16 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
     public async Task<RegisterResult> RegisterAsync(string email, string password, string userName, [Phone]string phoneNumber,
         string oneTimePassword, CancellationToken ct) //CancellationToken gadmoveci raxan standartia ar aqvs supporti samwuxarod da IsCancellationRequested gamoyeneba anti-pattern aris aq
     {
-        var isValidToken = await otpService.ValidateOtpAsync(phoneNumber, oneTimePassword);
-        if (!isValidToken)
-        {            //ToDo Log 
-            return RegisterResult.InvalidOtp();
-        }
-
         var user = new ApplicationUser { Email = email, UserName = userName, PhoneNumber = phoneNumber , PhoneNumberConfirmed = true, LastOtpSentTime = DateTime.UtcNow};
         
         var result = await userManager.CreateAsync(user, password);
-         await userManager.AddToRoleAsync(user, Roles.Employee);
+        if (!result.Succeeded) 
+            return RegisterResult.Failed(result.Errors.Adapt<ApplicationError[]>());
+        
+        var addRoleTask = userManager.AddToRoleAsync(user, Roles.Employee);
+        var tokenTask = CreateTokenResponse(user);
+
+        await Task.WhenAll(addRoleTask, tokenTask); 
         return !result.Succeeded ? RegisterResult.Failed(result.Errors.Adapt<ApplicationError[]>()) : RegisterResult.Success(user.Id , await CreateTokenResponse(user));
     }
 
@@ -83,7 +83,7 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
         return ChangePasswordResult.Succeed(await CreateTokenResponse(user));
     }
 
-    public async Task ForgotPassword(string email)
+    public async Task ForgotPassword(string email, string clientUri)
     {
         var  user = await userManager.FindByEmailAsync(email);
         if (user is null)
@@ -91,20 +91,18 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
             return ;
         }
         var token =  await userManager.GeneratePasswordResetTokenAsync(user);
-
-        var uri = new UriBuilder("https", "localhost", 7092, $"api/users-auth/forgot-password")
-        {
-            Query = $"email={user.Email}&code={token}"
-        };
+        
+        var callbackUrl = $"{clientUri}?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(email)}";        
+        
         await emailSender.SendEmailAsync(new EmailData
         {
             EmailSubject = $"Reset Password Request for {user.UserName}", 
             EmailToName = user.Email!,
             Message =
-                $"A password reset was requested from your account. If it was not you, please change your password. If you requested this action please on this Link {uri}"
+                $"A password reset was requested from your account. If it was not you, please change your password. If you requested this action please on this Link {callbackUrl}"
         });
 
-        await CreateTokenResponse(user); //to invalidate previous token
+        await CreateTokenResponse(user); //to invalidate previous token // it does not work like this lol i forgot
 
     }
     public async Task<AuthResult> NewPasswordAsync(string email, string code , string newPassword)
@@ -148,9 +146,9 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
         await userManager.UpdateSecurityStampAsync(user);
         return AuthResult.Succeed(await CreateTokenResponse(user), user.Id, UserRole.Admin);//Incorrect should be ext method with mapping or [Description] attribute and get role method
     }
-    public async Task<AuthResult> RemoveAdminRoleAsync(string removeRoleFromEmail, int requesterId)
+    public async Task<AuthResult> RemoveAdminRoleAsync(string assignRoleToEmail, int requesterId)
     {
-        var user = await userManager.FindByEmailAsync(removeRoleFromEmail);
+        var user = await userManager.FindByEmailAsync(assignRoleToEmail);
         if (user is null)
         {
             return  AuthResult.Failed([new ApplicationError("UserNotFound", "User not found" )]);
@@ -164,7 +162,7 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
         var userRoles = await userManager.GetRolesAsync(user);
         if (!userRoles.Contains(Roles.Admin))
         {
-            return AuthResult.Failed([new ApplicationError("AlreadyExists", "User has this organizer role")]);
+            return AuthResult.Succeed(new TokensReponse());//Not requires error because nothing happened actually just return nothing
         }
         
         var result = await userManager.RemoveFromRoleAsync(user, Roles.Admin);
@@ -219,7 +217,7 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
         
         if (!userRoles.Contains(Roles.Organizer))
         {
-            return AuthResult.Failed([new ApplicationError("AlreadyExists", "User has this organizer role")]);
+            return AuthResult.Succeed(new TokensReponse());//Not requires error because nothing happened actually just return nothing
         }
 
         var result = await userManager.RemoveFromRoleAsync(user, Roles.Organizer);

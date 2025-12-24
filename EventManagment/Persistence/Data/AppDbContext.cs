@@ -27,13 +27,13 @@ public class AppDbContext : IdentityDbContext<ApplicationUser,ApplicationRole,in
     public virtual DbSet<RegistrationStatusEntity> RegistrationStatuses { get; set; }
     
     public virtual DbSet<TagEntity> Tags { get; set; }
-
+    public virtual DbSet<AgendaItemEntity> Agendas { get; set; }
     public virtual DbSet<UserEntity> DomainUsers { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         base.OnModelCreating(modelBuilder);
-
+        modelBuilder.Entity<EventEntity>().HasQueryFilter(e => e.IsActive); //Other Soft Delete entities 
     }
 }
