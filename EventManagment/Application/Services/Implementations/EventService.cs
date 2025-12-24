@@ -1,70 +1,55 @@
+
+
+using Application.Exceptions;
 using Application.Repositories;
+using Application.Requests.Events;
 using Application.Services.Abstractions;
 using Domain.Models;
 using Mapster;
 
 namespace Application.Services.Implementations;
 
-public class EventService(IEventRepository repository, ICurrentUserService currentUser) : IEventService
+public class EventService(IEventRepository repository , ICurrentUserService currentUser) : IEventService
 {
-
-    public async Task CreateEventAsync(CreateEventRequest request,CancellationToken cancellationToken)
+    public Task<int> CreateEventAsync(CreateEventRequest request, CancellationToken cancellationToken)
     {
-        
       var newEvent = request.Adapt<Event>();
       newEvent.IsActive = true;
       newEvent.CreatedAt = DateTime.UtcNow;
       newEvent.UpdatedAt = DateTime.UtcNow;
       newEvent.CreatedById = currentUser.UserId;
-      newEvent.EventTypeId = request.EventTypeId;
-      await repository.CreateEventAsync(newEvent,request.TagIds,cancellationToken);
+     return repository.CreateEventAsync(newEvent,request.TagIds,cancellationToken); //to aptimize it
+    }
+    public async Task<int> CreateAndAddAgendaToEvent(int eventId,CreateAgendaRequest request, CancellationToken cancellationToken)
+    {
+        var @event = await repository.GetEventByIdAsync(eventId, cancellationToken);
+        if (@event == null) throw new NotFoundException();
+
+        var agenda = request.Adapt<AgendaItem>();
+
+        @event.AddAgendaItem(agenda);
+
+       var result =  await repository.AddEventAgendaAsync(@event.Id, agenda, cancellationToken);
+       if(result is null) throw new NotFoundException();
+       return result.Value;
     }
 
-    public async Task CreateAndAddAgendaToEvent(int eventId,CreateAgendaRequest request, CancellationToken cancellationToken)
+    public async Task<int> UpdateEventAsync(UpdateEventRequest request, CancellationToken cancellationToken)
     {
-        var eventToAddAgenda = await repository.GetEventByIdAsync(eventId, cancellationToken);
-        var agenda = request.Adapt<AgendaItem>();
-        if (request.AgendaTracks is not null && request.AgendaTracks!.Any())
-        {
-            foreach (var track in request.AgendaTracks)
-            {
-                agenda.AddTrackItem(track.Adapt<AgendaTrack>());
-            }
-        }
-        eventToAddAgenda.AddAgendaItem(agenda);
-        await repository.UpdateEventAsync(eventToAddAgenda, cancellationToken);
+       var result =  await repository.UpdateEventAsync(request, cancellationToken);
+       if(result is null) throw new Exception("Event not found");
+       return result.Value;
     }
     
+    public async Task<int> UpdateAgendaItemAsync(UpdateAgendaRequest request, CancellationToken cancellationToken)
+    { 
+        
+        var result =  await repository.UpdateAgendaItemAsync(request, cancellationToken);
+         if(result is null)
+             throw new NotFoundException();
+         return result.Value;
+    }
 }
 
-public sealed record CreateAgendaRequest
-{
-    public TimeOnly StartTime { get; set; }
-    public TimeSpan Duration { get; set; }
-    public string Title { get; set; } = null!;
-    public string? Description { get; set; }
-    public AgendaItemType Type { get; set; }
-    public string? Location { get; set; }
-    public List<AgendaTrackRequest>? AgendaTracks { get; init; } = new();
-}
 
-public sealed record AgendaTrackRequest
-{
-    public string Title { get; set; } = null!;
-    public string? Speaker { get; set; }
-    public string? Room { get; set; }
-}
-public sealed record CreateEventRequest
-{
-    public string Title { get; init; } = null!;
-    public string? Description { get; init; }
-    public DateTime StartDateTime { get; init; }
-    public DateTime EndDateTime { get; init; }
-    public DateOnly RegistrationStart { get; init; }
-    public DateOnly RegistrationEnd { get; init; }
-    public Location Location { get; init; } = null!;
-    public int Capacity { get; init; } 
-    public string? ImageUrl { get; init; }
-    public List<int> TagIds { get; init; }
-    public int EventTypeId { get; init; }
-}
+

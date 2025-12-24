@@ -54,7 +54,7 @@ public class UsersAuthController(IUserService userService) : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("send-reset-password-link")]
-    public async Task<IActionResult> SendResetPasswordCode(RoleRequest request,
+    public async Task<IActionResult> SendResetPasswordCode(ForgotPasswordLinkRequest request,
         CancellationToken cancellationToken)
     {
         await userService.ForgotPasswordAsync(request);

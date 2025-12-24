@@ -13,7 +13,7 @@ public interface IIdentityService
         string newPassword);
 
     Task PreregisterOtpSendAsync(string phoneNumber);
-    Task ForgotPassword(string email);
+    Task ForgotPassword(string email, string baseUrl);
     Task<AuthResult> NewPasswordAsync(string email, string code, string newPassword);
     Task<AuthResult> AssignAdminRoleAsync(string email);
     Task<AuthResult> RemoveAdminRoleAsync(string email, int requesterId);

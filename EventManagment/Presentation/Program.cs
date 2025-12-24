@@ -1,14 +1,18 @@
 using System.Text.Json.Serialization;
+using Application.Mapping;
+using Application.Services.Abstractions;
+using Application.Services.Implementations;
 using Infrastructure.Mappings;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
 using Persistence.Mappings;
+using Presentation;
 using Presentation.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddSingleton<IOtpService, OtpService>();
 
 
 
@@ -17,7 +21,7 @@ builder.Services.AddScoped<IOtpService, OtpService>();
 
 DomainToEntityMappings.ConfigureMappings();
 IdentityErrorToApplicationMappings.ConfigureMappings();
-
+RequestsToDomain.ConfigureMappings();
 
 
 /*builder.Services.AddStackExchangeRedisCache(options =>
@@ -37,12 +41,16 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-
+builder.AddApplicationServices();
 if (builder.Environment.IsDevelopment())
 {
     builder.addSwaggerAuthDevelopment();
+    builder.Services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
 }
-
+else
+{
+    builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+}
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -50,9 +58,18 @@ builder.AddEmailSenders();
 builder.AddAllRepositories();
 
 builder.AddAllIdentity();
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("NgrokGuidPolicy", builder =>
+    {
+        builder.AllowAnyOrigin() 
+            .AllowAnyMethod()   
+            .AllowAnyHeader(); 
+    });
+});
 var app = builder.Build();
 
+app.UseCors(corsPolicyBuilder => corsPolicyBuilder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -67,5 +84,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();

@@ -18,18 +18,15 @@ public static class DomainToEntityMappings
 
     private static void ConfigureEvent()
     {
+        TypeAdapterConfig<Location, LocationEntity>.NewConfig();
+        TypeAdapterConfig<Address, AddressEntity>.NewConfig();
+        
         TypeAdapterConfig<LocationEntity, Location>
             .NewConfig()
             .Map(dest => dest.Address, src => src.Address.Adapt<Address>());
-
-        TypeAdapterConfig<Location, LocationEntity>
-            .NewConfig()
-            .Map(dest => dest.Address, src => src.Address.Adapt<AddressEntity>());
-
+        
         TypeAdapterConfig<EventEntity, Event>
             .NewConfig()
-            .Map(dest => dest.Location, src => src.Location.Adapt<Location>())
-            .Ignore(dest => dest.Agendas)
             .Map(dest => dest.Tags,
                 src => src.EventTags
                     .Select(et => et.TagEntity.Adapt<Tag>())
@@ -38,10 +35,7 @@ public static class DomainToEntityMappings
 
         TypeAdapterConfig<Event, EventEntity>
             .NewConfig()
-            .Map(dest => dest.Location, src => src.Location.Adapt<LocationEntity>())
-            .Ignore(dest => dest.Agendas)
-            .Ignore(dest => dest.EventTags)
-            .Ignore(dest => dest.Agendas)
+            .Map(dest => dest.CreatedById, src => src.CreatedById)
             .Ignore(dest => dest.Registrations)
             .Ignore(dest => dest.CreatedBy)
             .Ignore(dest => dest.EventTypeEntity);
@@ -49,9 +43,14 @@ public static class DomainToEntityMappings
 
     private static void ConfigureAgenda()
     {
+        TypeAdapterConfig<AgendaItem, AgendaItemEntity>
+            .NewConfig()
+            .Ignore(dest => dest.Event)
+            .Ignore(dest => dest.EventId);
+        
         TypeAdapterConfig<AgendaItemEntity, AgendaItem>
             .NewConfig()
-            .Map(dest => dest.Tracks, src => src.Tracks.Adapt<List<AgendaTrack>>());
+            .Map(dest => dest.Tracks, src => src.Tracks, src => src.Tracks != null && src.Tracks.Any());
         TypeAdapterConfig<AgendaTrackEntity, AgendaTrack>.NewConfig();
 
         TypeAdapterConfig<AgendaTrack, AgendaTrackEntity>
