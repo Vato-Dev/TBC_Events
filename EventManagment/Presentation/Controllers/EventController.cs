@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.DTOs.RequestModels;
 using Presentation.DTOs.ResponseModels;
+using System.Security.Claims;
 
 namespace Presentation.Controllers
 {
@@ -21,11 +22,12 @@ namespace Presentation.Controllers
 
 
         [HttpGet("filters-meta")]
-        [Authorize]
+       // [Authorize]
         public async Task<ActionResult<EventFiltersMetaResponseDto>> GetMeta(
             CancellationToken cancellationToken)
         {
             // user context comes from JWT
+         //   var currentUser = this.User.FindFirstValue("Sid");
             var userId = 1;
 
             var meta = await _eventService.GetFiltersMetaAsync(userId, cancellationToken);
@@ -34,12 +36,12 @@ namespace Presentation.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+       // [Authorize]
         public async Task<ActionResult<EventsSearchResponse>> GetEvents(
             [FromQuery] EventsSearchRequestDto query,
             CancellationToken ct)
         {
-            var userId = 1; // later from JWT
+            var userId = 4; // later from JWT
 
             var filters = query.Adapt<EventsSearchFilters>();
             var result = await _eventService.GetEventsAsync(userId, filters, ct);
@@ -48,7 +50,7 @@ namespace Presentation.Controllers
         }
 
         [HttpGet("categories")]
-        [Authorize]
+     //   [Authorize]
         public async Task<ActionResult<CategoriesResponse>> GetCategories(
             [FromQuery] bool withCounts = false,
             CancellationToken ct = default)

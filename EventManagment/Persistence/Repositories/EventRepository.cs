@@ -6,6 +6,7 @@ using Mapster;
 using Persistence.Data;
 using Persistence.Entities;
 using Persistence.Mappings;
+using System.Diagnostics;
 
 namespace Persistence.Repositories;
 public class EventRepository(AppDbContext context) : IEventRepository
@@ -76,8 +77,6 @@ public class EventRepository(AppDbContext context) : IEventRepository
                     Count = events.Count()
                 }
             )
-            .OrderByDescending(c => c.Count)
-            .ThenBy(c => c.Name)
             .ToListAsync(ct);
 
         return new CategoriesResult
@@ -166,26 +165,42 @@ public class EventRepository(AppDbContext context) : IEventRepository
         if (filters.CapacityAvailability is { Count: > 0 })
         {
             query = query.Where(e =>
-                filters.CapacityAvailability!.Contains(
-                    EventStatusMapper.MapCapacityAvailability(e.Capacity - e.RegisteredUsers)
-                )
-            );
+                filters.CapacityAvailability.Contains(
+                    (e.Capacity - e.RegisteredUsers) > 5
+                        ? CapacityAvailability.AVAILABLE
+                        : (e.Capacity - e.RegisteredUsers) >= 1
+                            ? CapacityAvailability.LIMITED
+                            : CapacityAvailability.FULL
+                ));
         }
 
         // MyStatuses (still from Registrations)
         if (filters.MyStatuses is { Count: > 0 })
         {
-            query = query.Where(e =>
-                filters.MyStatuses!.Contains(
-                    EventStatusMapper.MapMyStatus(
-                        e.Registrations
-                            .Where(r => r.UserId == customerId)
-                            .OrderByDescending(r => r.RegisteredAt ?? DateTime.MinValue)
+            var allowed = filters.MyStatuses!;
+            var customerIdLocal = customerId;
+
+            query =
+                query.Select(e => new
+                {
+                    Event = e,
+                    LatestStatusName = e.Registrations
+                            .Where(r => r.UserId == customerIdLocal)
+                            .OrderByDescending(r => r.RegisteredAt) // ensure non-null or handle nulls
                             .Select(r => r.StatusEntity.Name)
                             .FirstOrDefault()
-                    )
-                )
-            );
+                })
+                    .Where(x =>
+                        allowed.Contains(
+                            x.LatestStatusName == "Confirmed"
+                                ? MyStatus.CONFIRMED
+                                : x.LatestStatusName == "Waitlisted"
+                                    ? MyStatus.WAITLISTED
+                                    : x.LatestStatusName == "Cancelled"
+                                      ? MyStatus.CANCELLED 
+                                      : MyStatus.NOT_REGISTERED
+                        ))
+                    .Select(x => x.Event);
         }
 
         var totalCount = await query.CountAsync(ct);
@@ -233,7 +248,7 @@ public class EventRepository(AppDbContext context) : IEventRepository
                     e.Capacity - e.RegisteredUsers
                 ),
 
-                MyStatus = EventStatusMapper.MapMyStatusNullable(
+                MyStatus = EventStatusMapper.MapMyStatus(
                     e.Registrations
                         .Where(r => r.UserId == customerId)
                         .OrderByDescending(r => r.RegisteredAt ?? DateTime.MinValue)
@@ -277,61 +292,91 @@ public class EventRepository(AppDbContext context) : IEventRepository
         };
     }
 
-    private Task<List<LookupCount>> GetEventTypesAsync(IQueryable<EventEntity> activeEvents, CancellationToken ct)
+    private async Task<List<LookupCount>> GetEventTypesAsync(
+        IQueryable<EventEntity> activeEvents,
+        CancellationToken ct)
     {
-        return context.EventTypes
+        var data = await context.EventTypes
             .AsNoTracking()
             .Where(et => et.IsActive)
             .GroupJoin(
                 activeEvents,
                 et => et.Id,
                 e => e.EventTypeId,
-                (et, events) => new LookupCount(et.Id, et.Name, events.Count())
-            )
+                (et, events) => new
+                {
+                    et.Id,
+                    et.Name,
+                    Count = events.Count()
+                })
             .OrderByDescending(x => x.Count)
             .ThenBy(x => x.Name)
             .ToListAsync(ct);
+
+        return data.Select(x => new LookupCount(x.Id, x.Name, x.Count)).ToList();
     }
 
-    private Task<List<LookupCount>> GetLocationsAsync(
+
+
+    private async Task<List<LookupCount>> GetLocationsAsync(
         IQueryable<EventEntity> activeEvents,
         CancellationToken ct)
     {
-        return activeEvents
-            .Where(e => e.Location != null &&
-                        e.Location.Address != null &&
-                        !string.IsNullOrWhiteSpace(e.Location.Address.VenueName))
-            .GroupBy(e => e.Location.Address.VenueName)
-            .Select(g => new LookupCount(
-                null,
-                g.Key,
-                g.Count()
-            ))
+        var data = await activeEvents
+            .Where(e =>
+                e.Location != null &&
+                e.Location.Address != null &&
+                e.Location.Address.VenueName != null &&
+                e.Location.Address.VenueName != "")
+            .GroupBy(e => e.Location!.Address!.VenueName!)
+            .Select(g => new
+            {
+                Name = g.Key,
+                Count = g.Count()
+            })
             .OrderByDescending(x => x.Count)
             .ThenBy(x => x.Name)
             .ToListAsync(ct);
+
+        return data.Select(x => new LookupCount(null, x.Name, x.Count)).ToList();
     }
 
 
-    private Task<List<LookupCount>> GetRegistrationStatusesAsync(IQueryable<EventEntity> activeEvents, CancellationToken ct)
+
+    private async Task<List<LookupCount>> GetRegistrationStatusesAsync(
+        IQueryable<EventEntity> activeEvents,
+        CancellationToken ct)
     {
         var regsOnActiveEvents =
             context.Registrations
                 .AsNoTracking()
                 .Join(activeEvents, r => r.EventId, e => e.Id, (r, _) => r);
 
-        return context.RegistrationStatuses
+        var countsByStatus =
+            regsOnActiveEvents
+                .GroupBy(r => r.StatusId)
+                .Select(g => new { StatusId = g.Key, Count = g.Count() });
+
+        var data = await context.RegistrationStatuses
             .AsNoTracking()
             .GroupJoin(
-                regsOnActiveEvents,
+                countsByStatus,
                 rs => rs.Id,
-                r => r.StatusId,
-                (rs, regs) => new LookupCount(rs.Id, rs.Name, regs.Count())
-            )
+                c => c.StatusId,
+                (rs, c) => new
+                {
+                    rs.Id,
+                    rs.Name,
+                    Count = c.Select(x => x.Count).FirstOrDefault()
+                })
             .OrderByDescending(x => x.Count)
             .ThenBy(x => x.Name)
             .ToListAsync(ct);
+
+        return data.Select(x => new LookupCount(x.Id, x.Name, x.Count)).ToList();
     }
+
+
 
     private async Task<List<LookupCount>> GetCapacityAvailabilityAsync(IQueryable<EventEntity> activeEvents, CancellationToken ct)
     {

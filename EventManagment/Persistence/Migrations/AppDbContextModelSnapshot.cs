@@ -104,6 +104,28 @@ namespace Persistence.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            RoleId = 3
+                        },
+                        new
+                        {
+                            UserId = 2,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            UserId = 3,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            UserId = 4,
+                            RoleId = 1
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -282,121 +304,124 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = 2,
-                            Capacity = 30,
-                            CreatedAt = new DateTime(2025, 11, 1, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Capacity = 60,
+                            CreatedAt = new DateTime(2025, 12, 10, 10, 0, 0, 0, DateTimeKind.Utc),
                             CreatedById = 2,
-                            Description = "Casual networking + food",
-                            EndDateTime = new DateTime(2025, 12, 5, 13, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 2,
+                            Description = "Community meetup and short talks",
+                            EndDateTime = new DateTime(2026, 1, 15, 19, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            ImageUrl = "https://pics.example.com/events/graphql.png",
                             IsActive = true,
                             RegisteredUsers = 1,
-                            RegistrationEnd = new DateOnly(2025, 12, 4),
-                            RegistrationStart = new DateOnly(2025, 11, 15),
-                            StartDateTime = new DateTime(2025, 12, 5, 12, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Networking Lunch",
-                            UpdatedAt = new DateTime(2025, 11, 1, 9, 0, 0, 0, DateTimeKind.Utc)
+                            RegistrationEnd = new DateOnly(2026, 1, 14),
+                            RegistrationStart = new DateOnly(2025, 12, 20),
+                            StartDateTime = new DateTime(2026, 1, 15, 17, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "GraphQL Meetup: APIs in Practice",
+                            UpdatedAt = new DateTime(2025, 12, 10, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            Capacity = 30,
-                            CreatedAt = new DateTime(2025, 12, 1, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Capacity = 200,
+                            CreatedAt = new DateTime(2026, 1, 5, 11, 0, 0, 0, DateTimeKind.Utc),
                             CreatedById = 2,
-                            Description = "Outdoor team-building activity",
-                            EndDateTime = new DateTime(2026, 1, 10, 11, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 4,
+                            Description = "Live Q&A + examples",
+                            EndDateTime = new DateTime(2026, 2, 5, 17, 30, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
                             IsActive = true,
                             RegisteredUsers = 0,
-                            RegistrationEnd = new DateOnly(2026, 1, 9),
-                            RegistrationStart = new DateOnly(2025, 12, 15),
-                            StartDateTime = new DateTime(2026, 1, 10, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Team Building Walk",
-                            UpdatedAt = new DateTime(2025, 12, 1, 9, 0, 0, 0, DateTimeKind.Utc)
+                            RegistrationEnd = new DateOnly(2026, 2, 4),
+                            RegistrationStart = new DateOnly(2026, 1, 10),
+                            StartDateTime = new DateTime(2026, 2, 5, 16, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Virtual: Clean Architecture Q&A",
+                            UpdatedAt = new DateTime(2026, 1, 5, 11, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            Capacity = 100,
-                            CreatedAt = new DateTime(2025, 10, 20, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Mandatory internal training",
-                            EndDateTime = new DateTime(2025, 11, 25, 11, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 3,
-                            IsActive = true,
-                            RegisteredUsers = 1,
-                            RegistrationEnd = new DateOnly(2025, 11, 24),
-                            RegistrationStart = new DateOnly(2025, 11, 1),
-                            StartDateTime = new DateTime(2025, 11, 25, 10, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Security Awareness Training",
-                            UpdatedAt = new DateTime(2025, 10, 20, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Capacity = 30,
-                            CreatedAt = new DateTime(2026, 1, 1, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Best practices discussion",
-                            EndDateTime = new DateTime(2026, 2, 3, 13, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 1,
-                            IsActive = true,
-                            RegisteredUsers = 0,
-                            RegistrationEnd = new DateOnly(2026, 2, 2),
-                            RegistrationStart = new DateOnly(2026, 1, 10),
-                            StartDateTime = new DateTime(2026, 2, 3, 12, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Lunch & Learn: Clean Code",
-                            UpdatedAt = new DateTime(2026, 1, 1, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Capacity = 10,
-                            CreatedAt = new DateTime(2025, 11, 20, 9, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedById = 2,
-                            Description = "Optional wellness session",
-                            EndDateTime = new DateTime(2025, 12, 20, 9, 30, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 2,
-                            IsActive = true,
-                            RegisteredUsers = 1,
-                            RegistrationEnd = new DateOnly(2025, 12, 19),
-                            RegistrationStart = new DateOnly(2025, 12, 1),
-                            StartDateTime = new DateTime(2025, 12, 20, 8, 30, 0, 0, DateTimeKind.Utc),
-                            Title = "Wellness Morning Yoga",
-                            UpdatedAt = new DateTime(2025, 11, 20, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Capacity = 100,
+                            Capacity = 40,
                             CreatedAt = new DateTime(2026, 2, 1, 9, 0, 0, 0, DateTimeKind.Utc),
                             CreatedById = 2,
-                            Description = "Upcoming features overview",
-                            EndDateTime = new DateTime(2026, 3, 5, 15, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 3,
+                            Description = "Hands-on + streaming",
+                            EndDateTime = new DateTime(2026, 3, 12, 12, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
                             IsActive = true,
-                            RegisteredUsers = 0,
-                            RegistrationEnd = new DateOnly(2026, 3, 4),
+                            RegisteredUsers = 1,
+                            RegistrationEnd = new DateOnly(2026, 3, 11),
                             RegistrationStart = new DateOnly(2026, 2, 10),
-                            StartDateTime = new DateTime(2026, 3, 5, 14, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Product Roadmap Presentation",
+                            StartDateTime = new DateTime(2026, 3, 12, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Hybrid: Docker for .NET Developers",
                             UpdatedAt = new DateTime(2026, 2, 1, 9, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = 8,
-                            Capacity = 30,
-                            CreatedAt = new DateTime(2025, 9, 1, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 5,
+                            Capacity = 25,
+                            CreatedAt = new DateTime(2025, 9, 15, 12, 0, 0, 0, DateTimeKind.Utc),
                             CreatedById = 2,
-                            Description = "Giving back together",
-                            EndDateTime = new DateTime(2025, 10, 15, 13, 0, 0, 0, DateTimeKind.Utc),
-                            EventTypeId = 4,
+                            Description = "Indexing and query tuning",
+                            EndDateTime = new DateTime(2025, 10, 22, 15, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
                             IsActive = true,
                             RegisteredUsers = 0,
-                            RegistrationEnd = new DateOnly(2025, 10, 14),
-                            RegistrationStart = new DateOnly(2025, 9, 20),
-                            StartDateTime = new DateTime(2025, 10, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Community Volunteering Day",
-                            UpdatedAt = new DateTime(2025, 9, 1, 9, 0, 0, 0, DateTimeKind.Utc)
+                            RegistrationEnd = new DateOnly(2025, 10, 21),
+                            RegistrationStart = new DateOnly(2025, 10, 1),
+                            StartDateTime = new DateTime(2025, 10, 22, 13, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Past: SQL Performance Clinic",
+                            UpdatedAt = new DateTime(2025, 10, 1, 12, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Capacity = 300,
+                            CreatedAt = new DateTime(2026, 3, 1, 10, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "xUnit + Moq + patterns",
+                            EndDateTime = new DateTime(2026, 4, 8, 18, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            ImageUrl = "https://pics.example.com/events/testing.png",
+                            IsActive = true,
+                            RegisteredUsers = 1,
+                            RegistrationEnd = new DateOnly(2026, 4, 7),
+                            RegistrationStart = new DateOnly(2026, 3, 10),
+                            StartDateTime = new DateTime(2026, 4, 8, 15, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Virtual: Unit Testing Masterclass",
+                            UpdatedAt = new DateTime(2026, 3, 1, 10, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Capacity = 80,
+                            CreatedAt = new DateTime(2026, 4, 1, 8, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "Bring a project, ship something",
+                            EndDateTime = new DateTime(2026, 5, 20, 21, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            IsActive = true,
+                            RegisteredUsers = 0,
+                            RegistrationEnd = new DateOnly(2026, 5, 19),
+                            RegistrationStart = new DateOnly(2026, 4, 20),
+                            StartDateTime = new DateTime(2026, 5, 20, 18, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "In-Person: Hack Night",
+                            UpdatedAt = new DateTime(2026, 4, 1, 8, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Capacity = 50,
+                            CreatedAt = new DateTime(2026, 5, 1, 9, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "CI/CD + deploy walkthrough",
+                            EndDateTime = new DateTime(2026, 6, 11, 14, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            ImageUrl = "https://pics.example.com/events/cloud.png",
+                            IsActive = true,
+                            RegisteredUsers = 0,
+                            RegistrationEnd = new DateOnly(2026, 6, 10),
+                            RegistrationStart = new DateOnly(2026, 5, 10),
+                            StartDateTime = new DateTime(2026, 6, 11, 10, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Hybrid: Cloud Deployment Workshop",
+                            UpdatedAt = new DateTime(2026, 5, 1, 9, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -927,6 +952,72 @@ namespace Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "c6104f8c-3fe0-46f5-87d3-32c6b5752ce3",
+                            Email = "admin@demo.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@DEMO.COM",
+                            NormalizedUserName = "ADMIN@DEMO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEXwNjh/cHM8TuIe4nQwj6aqktRgMFamv0A52R9W52LODdV0TMqC0mDPyvzepoQn/Q==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "b8d0818d-f3bf-428f-b2ad-121c7fd982fb",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@demo.com"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "97c37233-bb96-41ac-9dc1-c0c76339c83f",
+                            Email = "organizer@demo.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ORGANIZER@DEMO.COM",
+                            NormalizedUserName = "ORGANIZER@DEMO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOgg/owrGvo5hFd7T8J3XskHHez2flBYU5M+e2p5tzHx0AbRyuxkwSdx9VjgDnjmIA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "02ee173f-cc43-4c2a-8000-bd3f9732728d",
+                            TwoFactorEnabled = false,
+                            UserName = "organizer@demo.com"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "d443077e-bc3d-4946-8b99-b79fa201ff99",
+                            Email = "employee1@demo.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "EMPLOYEE1@DEMO.COM",
+                            NormalizedUserName = "EMPLOYEE1@DEMO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEjHqwLXo0dEcJv26u5i5mGzlo4mQIou7aguIqlDupxvoRDEObE/xZapFxexoJlTRQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "639747a7-de46-47f4-b4cf-50684d086ca3",
+                            TwoFactorEnabled = false,
+                            UserName = "employee1@demo.com"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "c95670b8-7af5-48d2-8867-826b920657a8",
+                            Email = "employee2@demo.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "EMPLOYEE2@DEMO.COM",
+                            NormalizedUserName = "EMPLOYEE2@DEMO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPbXObJ+p+f4NnGi4dYtYs0Dm8+rWQqTuuXguH6aPb+xHrglIKZFlPX7nFEjMAJQ6g==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "4ce2bc8d-dc6b-42b5-84ef-35ec829f2ace",
+                            TwoFactorEnabled = false,
+                            UserName = "employee2@demo.com"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -1065,10 +1156,134 @@ namespace Persistence.Migrations
 
                                     b2.WithOwner()
                                         .HasForeignKey("LocationEntityEventEntityId");
+
+                                    b2.HasData(
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 1,
+                                            City = "Tbilisi",
+                                            Street = "Gerdasd",
+                                            VenueName = "Building"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 2,
+                                            City = "Tbilisi",
+                                            Street = "Rustaveli Ave",
+                                            VenueName = "Tech Hub"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 3,
+                                            City = "Remote",
+                                            Street = "N/A",
+                                            VenueName = "Online"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 4,
+                                            City = "Tbilisi",
+                                            Street = "Chavchavadze",
+                                            VenueName = "Conference Center"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 5,
+                                            City = "Tbilisi",
+                                            Street = "Kazbegi Ave",
+                                            VenueName = "DB Lab"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 6,
+                                            City = "Remote",
+                                            Street = "N/A",
+                                            VenueName = "Online"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 7,
+                                            City = "Tbilisi",
+                                            Street = "Tamarashvili",
+                                            VenueName = "Community Space"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 8,
+                                            City = "Tbilisi",
+                                            Street = "Pekini Ave",
+                                            VenueName = "Cloud Lab"
+                                        });
                                 });
 
                             b1.Navigation("Address")
                                 .IsRequired();
+
+                            b1.HasData(
+                                new
+                                {
+                                    EventEntityId = 1,
+                                    AdditionalInformation = "Sigma",
+                                    FloorNumber = 5,
+                                    LocationType = 0,
+                                    RoomNumber = 4
+                                },
+                                new
+                                {
+                                    EventEntityId = 2,
+                                    AdditionalInformation = "Snacks provided",
+                                    FloorNumber = 2,
+                                    LocationType = 0,
+                                    RoomNumber = 12
+                                },
+                                new
+                                {
+                                    EventEntityId = 3,
+                                    AdditionalInformation = "Join link in email",
+                                    FloorNumber = 0,
+                                    LocationType = 1,
+                                    RoomNumber = 0
+                                },
+                                new
+                                {
+                                    EventEntityId = 4,
+                                    AdditionalInformation = "Streaming available",
+                                    FloorNumber = 1,
+                                    LocationType = 2,
+                                    RoomNumber = 7
+                                },
+                                new
+                                {
+                                    EventEntityId = 5,
+                                    AdditionalInformation = "Bring laptop",
+                                    FloorNumber = 4,
+                                    LocationType = 0,
+                                    RoomNumber = 3
+                                },
+                                new
+                                {
+                                    EventEntityId = 6,
+                                    AdditionalInformation = "Recording will be shared",
+                                    FloorNumber = 0,
+                                    LocationType = 1,
+                                    RoomNumber = 0
+                                },
+                                new
+                                {
+                                    EventEntityId = 7,
+                                    AdditionalInformation = "Open seating",
+                                    FloorNumber = 6,
+                                    LocationType = 0,
+                                    RoomNumber = 21
+                                },
+                                new
+                                {
+                                    EventEntityId = 8,
+                                    AdditionalInformation = "Workshop materials included",
+                                    FloorNumber = 3,
+                                    LocationType = 2,
+                                    RoomNumber = 9
+                                });
                         });
 
                     b.Navigation("CreatedBy");

@@ -12,8 +12,8 @@ using Persistence.Data;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251223165943_AddAgendasItemTrackFixesUpdates")]
-    partial class AddAgendasItemTrackFixesUpdates
+    [Migration("20251224040132_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -107,6 +107,28 @@ namespace Persistence.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            RoleId = 3
+                        },
+                        new
+                        {
+                            UserId = 2,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            UserId = 3,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            UserId = 4,
+                            RoleId = 1
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -263,6 +285,147 @@ namespace Persistence.Migrations
                         .HasFilter("([IsActive]=(1))");
 
                     b.ToTable("Events", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Capacity = 10,
+                            CreatedAt = new DateTime(2025, 8, 1, 9, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "Introductory workshop (past event)",
+                            EndDateTime = new DateTime(2025, 9, 10, 12, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            IsActive = true,
+                            RegisteredUsers = 1,
+                            RegistrationEnd = new DateOnly(2025, 9, 9),
+                            RegistrationStart = new DateOnly(2025, 8, 20),
+                            StartDateTime = new DateTime(2025, 9, 10, 10, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Past Workshop: EF Core Basics",
+                            UpdatedAt = new DateTime(2025, 9, 1, 9, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Capacity = 60,
+                            CreatedAt = new DateTime(2025, 12, 10, 10, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "Community meetup and short talks",
+                            EndDateTime = new DateTime(2026, 1, 15, 19, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            ImageUrl = "https://pics.example.com/events/graphql.png",
+                            IsActive = true,
+                            RegisteredUsers = 1,
+                            RegistrationEnd = new DateOnly(2026, 1, 14),
+                            RegistrationStart = new DateOnly(2025, 12, 20),
+                            StartDateTime = new DateTime(2026, 1, 15, 17, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "GraphQL Meetup: APIs in Practice",
+                            UpdatedAt = new DateTime(2025, 12, 10, 10, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Capacity = 200,
+                            CreatedAt = new DateTime(2026, 1, 5, 11, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "Live Q&A + examples",
+                            EndDateTime = new DateTime(2026, 2, 5, 17, 30, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            IsActive = true,
+                            RegisteredUsers = 0,
+                            RegistrationEnd = new DateOnly(2026, 2, 4),
+                            RegistrationStart = new DateOnly(2026, 1, 10),
+                            StartDateTime = new DateTime(2026, 2, 5, 16, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Virtual: Clean Architecture Q&A",
+                            UpdatedAt = new DateTime(2026, 1, 5, 11, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Capacity = 40,
+                            CreatedAt = new DateTime(2026, 2, 1, 9, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "Hands-on + streaming",
+                            EndDateTime = new DateTime(2026, 3, 12, 12, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            IsActive = true,
+                            RegisteredUsers = 1,
+                            RegistrationEnd = new DateOnly(2026, 3, 11),
+                            RegistrationStart = new DateOnly(2026, 2, 10),
+                            StartDateTime = new DateTime(2026, 3, 12, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Hybrid: Docker for .NET Developers",
+                            UpdatedAt = new DateTime(2026, 2, 1, 9, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Capacity = 25,
+                            CreatedAt = new DateTime(2025, 9, 15, 12, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "Indexing and query tuning",
+                            EndDateTime = new DateTime(2025, 10, 22, 15, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            IsActive = true,
+                            RegisteredUsers = 0,
+                            RegistrationEnd = new DateOnly(2025, 10, 21),
+                            RegistrationStart = new DateOnly(2025, 10, 1),
+                            StartDateTime = new DateTime(2025, 10, 22, 13, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Past: SQL Performance Clinic",
+                            UpdatedAt = new DateTime(2025, 10, 1, 12, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Capacity = 300,
+                            CreatedAt = new DateTime(2026, 3, 1, 10, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "xUnit + Moq + patterns",
+                            EndDateTime = new DateTime(2026, 4, 8, 18, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            ImageUrl = "https://pics.example.com/events/testing.png",
+                            IsActive = true,
+                            RegisteredUsers = 1,
+                            RegistrationEnd = new DateOnly(2026, 4, 7),
+                            RegistrationStart = new DateOnly(2026, 3, 10),
+                            StartDateTime = new DateTime(2026, 4, 8, 15, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Virtual: Unit Testing Masterclass",
+                            UpdatedAt = new DateTime(2026, 3, 1, 10, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Capacity = 80,
+                            CreatedAt = new DateTime(2026, 4, 1, 8, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "Bring a project, ship something",
+                            EndDateTime = new DateTime(2026, 5, 20, 21, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            IsActive = true,
+                            RegisteredUsers = 0,
+                            RegistrationEnd = new DateOnly(2026, 5, 19),
+                            RegistrationStart = new DateOnly(2026, 4, 20),
+                            StartDateTime = new DateTime(2026, 5, 20, 18, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "In-Person: Hack Night",
+                            UpdatedAt = new DateTime(2026, 4, 1, 8, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Capacity = 50,
+                            CreatedAt = new DateTime(2026, 5, 1, 9, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedById = 2,
+                            Description = "CI/CD + deploy walkthrough",
+                            EndDateTime = new DateTime(2026, 6, 11, 14, 0, 0, 0, DateTimeKind.Utc),
+                            EventTypeId = 1,
+                            ImageUrl = "https://pics.example.com/events/cloud.png",
+                            IsActive = true,
+                            RegisteredUsers = 0,
+                            RegistrationEnd = new DateOnly(2026, 6, 10),
+                            RegistrationStart = new DateOnly(2026, 5, 10),
+                            StartDateTime = new DateTime(2026, 6, 11, 10, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Hybrid: Cloud Deployment Workshop",
+                            UpdatedAt = new DateTime(2026, 5, 1, 9, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.EventTagEntity", b =>
@@ -288,6 +451,26 @@ namespace Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("EventTags", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            EventId = 1,
+                            TagId = 5
+                        },
+                        new
+                        {
+                            Id = 2,
+                            EventId = 2,
+                            TagId = 3
+                        },
+                        new
+                        {
+                            Id = 3,
+                            EventId = 2,
+                            TagId = 4
+                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.EventTypeEntity", b =>
@@ -319,6 +502,43 @@ namespace Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("EventTypes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Hands-on session",
+                            IsActive = true,
+                            Name = "Workshop"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Community meetup",
+                            IsActive = true,
+                            Name = "Meetup"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Large multi-session event",
+                            IsActive = true,
+                            Name = "Conference"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Online session",
+                            IsActive = true,
+                            Name = "Webinar"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Internal team activity",
+                            IsActive = true,
+                            Name = "Team Building"
+                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.RegistrationEntity", b =>
@@ -360,6 +580,57 @@ namespace Persistence.Migrations
                         .HasFilter("([StatusId]>(3))");
 
                     b.ToTable("Registrations", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            EventId = 1,
+                            RegisteredAt = new DateTime(2025, 9, 1, 10, 0, 0, 0, DateTimeKind.Utc),
+                            StatusId = 4,
+                            UserId = 3
+                        },
+                        new
+                        {
+                            Id = 2,
+                            EventId = 2,
+                            RegisteredAt = new DateTime(2025, 11, 20, 10, 0, 0, 0, DateTimeKind.Utc),
+                            StatusId = 4,
+                            UserId = 4
+                        },
+                        new
+                        {
+                            Id = 3,
+                            EventId = 4,
+                            RegisteredAt = new DateTime(2025, 11, 10, 10, 0, 0, 0, DateTimeKind.Utc),
+                            StatusId = 4,
+                            UserId = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            EventId = 6,
+                            RegisteredAt = new DateTime(2025, 12, 10, 10, 0, 0, 0, DateTimeKind.Utc),
+                            StatusId = 4,
+                            UserId = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            EventId = 2,
+                            RegisteredAt = new DateTime(2025, 11, 21, 10, 0, 0, 0, DateTimeKind.Utc),
+                            StatusId = 2,
+                            UserId = 3
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CancelledAt = new DateTime(2025, 8, 28, 10, 0, 0, 0, DateTimeKind.Utc),
+                            EventId = 1,
+                            RegisteredAt = new DateTime(2025, 8, 25, 10, 0, 0, 0, DateTimeKind.Utc),
+                            StatusId = 3,
+                            UserId = 4
+                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.RegistrationStatusEntity", b =>
@@ -386,6 +657,32 @@ namespace Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("RegistrationStatuses", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Awaiting approval",
+                            Name = "Pending"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "No spots currently available",
+                            Name = "Waitlisted"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Registration cancelled",
+                            Name = "Cancelled"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Spot confirmed",
+                            Name = "Confirmed"
+                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.TagEntity", b =>
@@ -412,6 +709,44 @@ namespace Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Tags", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Category = "theme",
+                            Name = "outdoor"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Category = "theme",
+                            Name = "team-building"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Category = "perk",
+                            Name = "free-food"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Category = "theme",
+                            Name = "networking"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Category = "topic",
+                            Name = "tech"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Category = "topic",
+                            Name = "wellness"
+                        });
                 });
 
             modelBuilder.Entity("Persistence.Entities.UserEntity", b =>
@@ -457,6 +792,48 @@ namespace Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("DomainUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Department = 2,
+                            Email = "admin@demo.com",
+                            FullName = "Demo Admin",
+                            IsActive = true,
+                            Role = 3
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Department = 4,
+                            Email = "organizer@demo.com",
+                            FullName = "Demo Organizer",
+                            IsActive = true,
+                            Role = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Department = 6,
+                            Email = "employee1@demo.com",
+                            FullName = "Demo Employee 1",
+                            IsActive = true,
+                            Role = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Department = 1,
+                            Email = "employee2@demo.com",
+                            FullName = "Demo Employee 2",
+                            IsActive = true,
+                            Role = 1
+                        });
                 });
 
             modelBuilder.Entity("Persistence.IdentityModels.ApplicationRole", b =>
@@ -578,6 +955,72 @@ namespace Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "c6104f8c-3fe0-46f5-87d3-32c6b5752ce3",
+                            Email = "admin@demo.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@DEMO.COM",
+                            NormalizedUserName = "ADMIN@DEMO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEXwNjh/cHM8TuIe4nQwj6aqktRgMFamv0A52R9W52LODdV0TMqC0mDPyvzepoQn/Q==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "b8d0818d-f3bf-428f-b2ad-121c7fd982fb",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@demo.com"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "97c37233-bb96-41ac-9dc1-c0c76339c83f",
+                            Email = "organizer@demo.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ORGANIZER@DEMO.COM",
+                            NormalizedUserName = "ORGANIZER@DEMO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOgg/owrGvo5hFd7T8J3XskHHez2flBYU5M+e2p5tzHx0AbRyuxkwSdx9VjgDnjmIA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "02ee173f-cc43-4c2a-8000-bd3f9732728d",
+                            TwoFactorEnabled = false,
+                            UserName = "organizer@demo.com"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "d443077e-bc3d-4946-8b99-b79fa201ff99",
+                            Email = "employee1@demo.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "EMPLOYEE1@DEMO.COM",
+                            NormalizedUserName = "EMPLOYEE1@DEMO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEjHqwLXo0dEcJv26u5i5mGzlo4mQIou7aguIqlDupxvoRDEObE/xZapFxexoJlTRQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "639747a7-de46-47f4-b4cf-50684d086ca3",
+                            TwoFactorEnabled = false,
+                            UserName = "employee1@demo.com"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "c95670b8-7af5-48d2-8867-826b920657a8",
+                            Email = "employee2@demo.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "EMPLOYEE2@DEMO.COM",
+                            NormalizedUserName = "EMPLOYEE2@DEMO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPbXObJ+p+f4NnGi4dYtYs0Dm8+rWQqTuuXguH6aPb+xHrglIKZFlPX7nFEjMAJQ6g==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "4ce2bc8d-dc6b-42b5-84ef-35ec829f2ace",
+                            TwoFactorEnabled = false,
+                            UserName = "employee2@demo.com"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -691,7 +1134,7 @@ namespace Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("EventEntityId");
 
-                            b1.OwnsOne("Domain.Models.Address", "Address", b2 =>
+                            b1.OwnsOne("Persistence.Entities.AddressEntity", "Address", b2 =>
                                 {
                                     b2.Property<int>("LocationEntityEventEntityId")
                                         .HasColumnType("int");
@@ -716,10 +1159,134 @@ namespace Persistence.Migrations
 
                                     b2.WithOwner()
                                         .HasForeignKey("LocationEntityEventEntityId");
+
+                                    b2.HasData(
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 1,
+                                            City = "Tbilisi",
+                                            Street = "Gerdasd",
+                                            VenueName = "Building"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 2,
+                                            City = "Tbilisi",
+                                            Street = "Rustaveli Ave",
+                                            VenueName = "Tech Hub"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 3,
+                                            City = "Remote",
+                                            Street = "N/A",
+                                            VenueName = "Online"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 4,
+                                            City = "Tbilisi",
+                                            Street = "Chavchavadze",
+                                            VenueName = "Conference Center"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 5,
+                                            City = "Tbilisi",
+                                            Street = "Kazbegi Ave",
+                                            VenueName = "DB Lab"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 6,
+                                            City = "Remote",
+                                            Street = "N/A",
+                                            VenueName = "Online"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 7,
+                                            City = "Tbilisi",
+                                            Street = "Tamarashvili",
+                                            VenueName = "Community Space"
+                                        },
+                                        new
+                                        {
+                                            LocationEntityEventEntityId = 8,
+                                            City = "Tbilisi",
+                                            Street = "Pekini Ave",
+                                            VenueName = "Cloud Lab"
+                                        });
                                 });
 
                             b1.Navigation("Address")
                                 .IsRequired();
+
+                            b1.HasData(
+                                new
+                                {
+                                    EventEntityId = 1,
+                                    AdditionalInformation = "Sigma",
+                                    FloorNumber = 5,
+                                    LocationType = 0,
+                                    RoomNumber = 4
+                                },
+                                new
+                                {
+                                    EventEntityId = 2,
+                                    AdditionalInformation = "Snacks provided",
+                                    FloorNumber = 2,
+                                    LocationType = 0,
+                                    RoomNumber = 12
+                                },
+                                new
+                                {
+                                    EventEntityId = 3,
+                                    AdditionalInformation = "Join link in email",
+                                    FloorNumber = 0,
+                                    LocationType = 1,
+                                    RoomNumber = 0
+                                },
+                                new
+                                {
+                                    EventEntityId = 4,
+                                    AdditionalInformation = "Streaming available",
+                                    FloorNumber = 1,
+                                    LocationType = 2,
+                                    RoomNumber = 7
+                                },
+                                new
+                                {
+                                    EventEntityId = 5,
+                                    AdditionalInformation = "Bring laptop",
+                                    FloorNumber = 4,
+                                    LocationType = 0,
+                                    RoomNumber = 3
+                                },
+                                new
+                                {
+                                    EventEntityId = 6,
+                                    AdditionalInformation = "Recording will be shared",
+                                    FloorNumber = 0,
+                                    LocationType = 1,
+                                    RoomNumber = 0
+                                },
+                                new
+                                {
+                                    EventEntityId = 7,
+                                    AdditionalInformation = "Open seating",
+                                    FloorNumber = 6,
+                                    LocationType = 0,
+                                    RoomNumber = 21
+                                },
+                                new
+                                {
+                                    EventEntityId = 8,
+                                    AdditionalInformation = "Workshop materials included",
+                                    FloorNumber = 3,
+                                    LocationType = 2,
+                                    RoomNumber = 9
+                                });
                         });
 
                     b.Navigation("CreatedBy");
