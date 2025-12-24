@@ -88,7 +88,7 @@ public class UsersAuthController(IUserService userService) : ControllerBase
         return BadRequest(result.Errors);
     }
 
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme ,Roles = Roles.Admin)]
     [HttpPut("assign-admin")]
     public async Task<IActionResult> AssignAdminRole(
         [FromBody] RoleRequest request,
@@ -105,13 +105,13 @@ public class UsersAuthController(IUserService userService) : ControllerBase
         return BadRequest(result.Errors);
     }
     
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme ,Roles = Roles.Admin)]
     [HttpPut("remove-admin")]
     public async Task<IActionResult> RemoveAdminRole(
         [FromBody] RoleRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await userService.RemoveAdminRoleAsync(
+        var result = await userService.RemoveAdminRoleAsync(    
             request,
             cancellationToken
         );
@@ -120,8 +120,8 @@ public class UsersAuthController(IUserService userService) : ControllerBase
             return Ok(result.Tokens);
 
         return BadRequest(result.Errors);
-    }
-    [Authorize(Roles = Roles.Admin)]
+    }   
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme ,Roles = Roles.Admin)]
     [HttpPut("assign-organizer")]
     public async Task<IActionResult> AssignOrganizerRole(
         [FromBody] RoleRequest request,
@@ -137,7 +137,7 @@ public class UsersAuthController(IUserService userService) : ControllerBase
 
         return BadRequest(result.Errors);
     }
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme ,Roles = Roles.Admin)]
     [HttpPut("remove-organizer")]
     public async Task<IActionResult> RemoveOrganizerRole(
         [FromBody] RoleRequest request,

@@ -9,14 +9,16 @@ public static class JwtConfigurationExtensions
     {
         services.AddAuthentication(options =>
         {
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         })
         .AddJwtBearer(options =>
              {
                  options.TokenValidationParameters = new()
                  {
+                     RoleClaimType = "Role", 
+                     NameClaimType = "Preferred_name", 
                      ValidateAudience = true,
                      ValidateIssuer = true,
                      ValidateLifetime = true,
@@ -28,19 +30,6 @@ public static class JwtConfigurationExtensions
 
 
                      ClockSkew = TimeSpan.FromMinutes(3)
-                 };
-                 options.Events = new JwtBearerEvents
-                 {
-                     OnAuthenticationFailed = ctx =>
-                     {
-                         Console.WriteLine("JWT failed: " + ctx.Exception.Message);
-                         return Task.CompletedTask;
-                     },
-                     OnTokenValidated = ctx =>
-                     {
-                         Console.WriteLine("JWT valid for: " + ctx.Principal?.Identity?.Name);
-                         return Task.CompletedTask;
-                     }
                  };
     });
         return services;
@@ -58,13 +47,12 @@ public static class JwtConfigurationExtensions
         
     public static string GetJwtSecretKey(this IConfiguration configuration)
     {
-        return configuration.GetValueOrThrow("Authentication:SecretKey");
+        return configuration.GetValueOrThrow("Authentication:SecretForKey");
     }        
     public static SecurityKey GetIssuerSigningKey(this IConfiguration configuration)
     {
         return new SymmetricSecurityKey(Convert.FromBase64String(configuration.GetJwtSecretKey()));
     }
-
 
     public static string GetValueOrThrow(this IConfiguration configuration, string key)
     {
