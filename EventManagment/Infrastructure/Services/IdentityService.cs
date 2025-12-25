@@ -2,10 +2,13 @@ using System.ComponentModel.DataAnnotations;
 using Application.DTOs;
 using Application.IdentityModels.Results;
 using Application.Models;
+using Application.Repositories;
 using Application.Services.Abstractions;
 using Domain.Models;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Persistence.IdentityModels;
 
 namespace Infrastructure.Services;
@@ -16,7 +19,9 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
     IOtpService otpService,
     TokenService tokenService,  
     IEmailSender emailSender,
-    ISmsSender smsSender)
+    ISmsSender smsSender,
+    IUserRepository userRepository,
+    IServiceScopeFactory scopeFactory)
     : IIdentityService
 {
     public async Task<AuthResult> AuthenticateAsync(string email, string password) //Response request models
@@ -38,7 +43,7 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
     }
 
     public async Task<RegisterResult> RegisterAsync(string email, string password, string userName, [Phone]string phoneNumber,
-        string oneTimePassword, CancellationToken ct) //CancellationToken gadmoveci raxan standartia ar aqvs supporti samwuxarod da IsCancellationRequested gamoyeneba anti-pattern aris aq
+        string oneTimePassword,Department department,  CancellationToken ct) //CancellationToken gadmoveci raxan standartia ar aqvs supporti samwuxarod da IsCancellationRequested gamoyeneba anti-pattern aris aq
     {
         var user = new ApplicationUser { Email = email, UserName = userName, PhoneNumber = phoneNumber , PhoneNumberConfirmed = true, LastOtpSentTime = DateTime.UtcNow};
         
@@ -48,7 +53,28 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
         
         var addRoleTask = userManager.AddToRoleAsync(user, Roles.Employee);
         var tokenTask = CreateTokenResponse(user);
+        _ = Task.Run(async () =>
+        {
+            using var scope = scopeFactory.CreateScope();
+            var repo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
+            try
+            {
+                await repo.CreateUserAsync(new User
+                {
+                    Department = department,
+                    Email = email,
+                    CreatedAt = DateTime.UtcNow,
+                    FullName = userName,
+                    IsActive = true,
+                    Role = UserRole.Employee
+                }, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                //Todo loger
+            }
+        });
         await Task.WhenAll(addRoleTask, tokenTask); 
         return !result.Succeeded ? RegisterResult.Failed(result.Errors.Adapt<ApplicationError[]>()) : RegisterResult.Success(user.Id , await CreateTokenResponse(user));
     }

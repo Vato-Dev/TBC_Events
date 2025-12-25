@@ -1,4 +1,5 @@
 using Application.IdentityModels.Results;
+using Domain.Models;
 
 namespace Application.Services.Abstractions;
 
@@ -7,7 +8,7 @@ public interface IIdentityService
     Task<AuthResult> AuthenticateAsync(string email, string password);
 
     Task<RegisterResult> RegisterAsync(string email, string password, string userName, string phoneNumber,
-        string oneTimePassword, CancellationToken ct);
+        string oneTimePassword, Department department, CancellationToken ct);
 
     Task<ChangePasswordResult> ChangePasswordWithOldPasswordAsync(string email, string passwordCurrent,
         string newPassword);
