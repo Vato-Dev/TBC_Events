@@ -20,7 +20,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     
     
     [HttpGet]
-    [Route("api/events/{eventId:int}")]
+    [Route("test/{eventId:int}")]
     public async Task<IActionResult> GetEventByIdAsync(int eventId, CancellationToken cancellationToken)
     {
         return Ok(await eventService.GetEventByIdAsyncc(eventId, cancellationToken));
@@ -125,7 +125,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpPost]
-    [Route("api/events/create-event")]
+    [Route("create-event")]
     public async Task<IActionResult> CreateEvent([FromBody] CreateEventRequest request,
         CancellationToken cancellationToken)
     {
@@ -133,7 +133,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpPost]
-    [Route("api/events/{eventId:int}/create-agenda")]
+    [Route("{eventId:int}/create-agenda")]
     public async Task<IActionResult> CreateAgendaToEvent(int eventId, CreateAgendaRequest request,
         CancellationToken cancellationToken)
     {
@@ -142,8 +142,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
-    [Route("api/events/update-event")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]    [Route("api/events/update-event")]
     public async Task<IActionResult> UpdateEvent([FromBody] UpdateEventRequest request,
         CancellationToken cancellationToken)
     {
@@ -152,7 +151,7 @@ public class EventsController(IEventService eventService) : ControllerBase
 
     [HttpPost]
    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("api/events/update-agenda")]
+    [Route("update-agenda")]
     public async Task<IActionResult> UpdateAgendaToEvent(UpdateAgendaRequest request,
         CancellationToken cancellationToken)
     {
@@ -210,7 +209,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     
     
     [HttpDelete]
-    [Route("api/events/delete-event")]
+    [Route("delete-event")]
     public async Task<IActionResult> DeleteEventAsync(int eventId, CancellationToken cancellationToken)
     {
         await eventService.DeleteEventAsync(eventId, cancellationToken);
