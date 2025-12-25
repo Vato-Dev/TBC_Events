@@ -3,6 +3,7 @@ using Application.Mapping;
 using Application.Services.Abstractions;
 using Application.Services.Implementations;
 using Application.Extensions;
+using Infrastructure.BackGroundJobs;
 using Infrastructure.Mappings;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSingleton<IOtpService, OtpService>();
 
+builder.Services.AddQuaertzJobs();
 
 
 

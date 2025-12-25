@@ -246,6 +246,7 @@ namespace Persistence.Migrations
                     Location_RoomNumber = table.Column<int>(type: "int", nullable: false),
                     Location_FloorNumber = table.Column<int>(type: "int", nullable: false),
                     Location_AdditionalInformation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NotificationSettings = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     RegisteredUsers = table.Column<int>(type: "int", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
@@ -388,10 +389,10 @@ namespace Persistence.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LastOtpSentTime", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { 1, 0, "ca1b8751-a920-4346-b1fc-34c0a43b36fd", "admin@demo.com", true, null, false, null, "ADMIN@DEMO.COM", "ADMIN@DEMO.COM", "AQAAAAIAAYagAAAAEPAoOBXFAn6c/q5LNwvIeObvFe7Qnk56q4k2K73g6ZfJPV7LdMFKCgfAnO8KTxA13w==", null, false, "f3dea322-032b-456f-a541-2630b7ce883c", false, "admin@demo.com" },
-                    { 2, 0, "a54a29cc-1b48-4f9a-b5ef-b7373f5c86b5", "organizer@demo.com", true, null, false, null, "ORGANIZER@DEMO.COM", "ORGANIZER@DEMO.COM", "AQAAAAIAAYagAAAAEOd6LV5gAIWE3useD9A9VK3UXSOwX5A9+AvSUP/a1dKh6eEol8/8o8E+FsKWyPOvew==", null, false, "d747028d-c837-4f34-a9a4-408b2dfdfb59", false, "organizer@demo.com" },
-                    { 3, 0, "cbdb0696-2bc5-44a4-be07-b31f21a520e8", "employee1@demo.com", true, null, false, null, "EMPLOYEE1@DEMO.COM", "EMPLOYEE1@DEMO.COM", "AQAAAAIAAYagAAAAEK2phzUSMlW4iHsMAmFCSwdhC6acpVKXr+iuIaSoaPS3+Hq8lmoypnETYib678TCXQ==", null, false, "fd550ba5-e278-4dfe-b98e-c2ede820e53a", false, "employee1@demo.com" },
-                    { 4, 0, "06271632-a0d6-4556-ae9b-aa73622cbccb", "employee2@demo.com", true, null, false, null, "EMPLOYEE2@DEMO.COM", "EMPLOYEE2@DEMO.COM", "AQAAAAIAAYagAAAAEPlfjl2K3m/cXyAyi/2ECR39LdGeU1PHySoVCE3KceA+G/uP73Qq1+lLa8FBi+cLsQ==", null, false, "63372ba7-eaaa-450b-8f66-08ced363236a", false, "employee2@demo.com" }
+                    { 1, 0, "4013f38b-691b-4620-9707-a4f1575629d1", "admin@demo.com", true, null, false, null, "ADMIN@DEMO.COM", "ADMIN@DEMO.COM", "AQAAAAIAAYagAAAAEIFDW6DmZyDAaerp5dk9SGTkLIyjmCZJYjEFSljvWg1g+hEkUy77/M995TwmIrGoBQ==", null, false, "b909d6d9-9c21-47af-8738-c7eeade67f4c", false, "admin@demo.com" },
+                    { 2, 0, "294c01f9-b0e1-4488-baba-f9a5a4fac90c", "organizer@demo.com", true, null, false, null, "ORGANIZER@DEMO.COM", "ORGANIZER@DEMO.COM", "AQAAAAIAAYagAAAAEN3fblC6s4i16grF4oCAjaFKcYUxbJAS1vDht8DSckUKJ3o8bQTZvVV1cd8C41CM5A==", null, false, "59a6d2e3-e66b-4617-9586-91242743d02d", false, "organizer@demo.com" },
+                    { 3, 0, "74793599-8491-41e6-861d-631e953b1d26", "employee1@demo.com", true, null, false, null, "EMPLOYEE1@DEMO.COM", "EMPLOYEE1@DEMO.COM", "AQAAAAIAAYagAAAAEIZ218hpd1Yy0ro9q37BjYS8rx8+7z0wmlP4n69qktvvs2hJ8uFNPVoPFJqV7FxnNA==", null, false, "4941a6de-4bda-4080-abe2-47917c3b62e9", false, "employee1@demo.com" },
+                    { 4, 0, "24df6cde-7939-4258-88ac-cf102e20ebd7", "employee2@demo.com", true, null, false, null, "EMPLOYEE2@DEMO.COM", "EMPLOYEE2@DEMO.COM", "AQAAAAIAAYagAAAAEIl2KxDTkFeXvT8LqazKRqDi0EmM7rH/c8LfFIPRdBEL2fFRhJnPBEUxaCa4y6bNmg==", null, false, "672fcc43-895f-4757-833c-705aa79fddbd", false, "employee2@demo.com" }
                 });
 
             migrationBuilder.InsertData(

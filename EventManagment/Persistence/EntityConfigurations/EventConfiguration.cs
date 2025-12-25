@@ -16,6 +16,7 @@ public class EventConfiguration : IEntityTypeConfiguration<EventEntity>
 
         builder.HasIndex(e => e.StartDateTime, "IX_Events_StartDateTime_Active").HasFilter("([IsActive]=(1))");
 
+        builder.Property(e => e.NotificationSettings).HasDefaultValue(NotificationSettings.None);
         builder.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
         builder.Property(e => e.ImageUrl).HasMaxLength(500);
         builder.Property(e => e.IsActive).HasDefaultValue(true);

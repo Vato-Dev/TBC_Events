@@ -10,6 +10,8 @@ public static class ServiceCollectionExtensions
     {
         collection.AddScoped<IEventRepository, EventRepository>();
         collection.AddScoped<IUserRepository, UserRepository>();
+        collection.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
+
         return collection;
     }
 }

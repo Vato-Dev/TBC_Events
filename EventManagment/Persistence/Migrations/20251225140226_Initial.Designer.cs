@@ -12,7 +12,7 @@ using Persistence.Data;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251224160928_Initial")]
+    [Migration("20251225140226_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -533,6 +533,11 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
+
+                    b.Property<int>("NotificationSettings")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<int>("RegisteredUsers")
                         .HasColumnType("int");
@@ -1243,15 +1248,15 @@ namespace Persistence.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ca1b8751-a920-4346-b1fc-34c0a43b36fd",
+                            ConcurrencyStamp = "4013f38b-691b-4620-9707-a4f1575629d1",
                             Email = "admin@demo.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@DEMO.COM",
                             NormalizedUserName = "ADMIN@DEMO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPAoOBXFAn6c/q5LNwvIeObvFe7Qnk56q4k2K73g6ZfJPV7LdMFKCgfAnO8KTxA13w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIFDW6DmZyDAaerp5dk9SGTkLIyjmCZJYjEFSljvWg1g+hEkUy77/M995TwmIrGoBQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f3dea322-032b-456f-a541-2630b7ce883c",
+                            SecurityStamp = "b909d6d9-9c21-47af-8738-c7eeade67f4c",
                             TwoFactorEnabled = false,
                             UserName = "admin@demo.com"
                         },
@@ -1259,15 +1264,15 @@ namespace Persistence.Migrations
                         {
                             Id = 2,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a54a29cc-1b48-4f9a-b5ef-b7373f5c86b5",
+                            ConcurrencyStamp = "294c01f9-b0e1-4488-baba-f9a5a4fac90c",
                             Email = "organizer@demo.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ORGANIZER@DEMO.COM",
                             NormalizedUserName = "ORGANIZER@DEMO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOd6LV5gAIWE3useD9A9VK3UXSOwX5A9+AvSUP/a1dKh6eEol8/8o8E+FsKWyPOvew==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN3fblC6s4i16grF4oCAjaFKcYUxbJAS1vDht8DSckUKJ3o8bQTZvVV1cd8C41CM5A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d747028d-c837-4f34-a9a4-408b2dfdfb59",
+                            SecurityStamp = "59a6d2e3-e66b-4617-9586-91242743d02d",
                             TwoFactorEnabled = false,
                             UserName = "organizer@demo.com"
                         },
@@ -1275,15 +1280,15 @@ namespace Persistence.Migrations
                         {
                             Id = 3,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cbdb0696-2bc5-44a4-be07-b31f21a520e8",
+                            ConcurrencyStamp = "74793599-8491-41e6-861d-631e953b1d26",
                             Email = "employee1@demo.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "EMPLOYEE1@DEMO.COM",
                             NormalizedUserName = "EMPLOYEE1@DEMO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEK2phzUSMlW4iHsMAmFCSwdhC6acpVKXr+iuIaSoaPS3+Hq8lmoypnETYib678TCXQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIZ218hpd1Yy0ro9q37BjYS8rx8+7z0wmlP4n69qktvvs2hJ8uFNPVoPFJqV7FxnNA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "fd550ba5-e278-4dfe-b98e-c2ede820e53a",
+                            SecurityStamp = "4941a6de-4bda-4080-abe2-47917c3b62e9",
                             TwoFactorEnabled = false,
                             UserName = "employee1@demo.com"
                         },
@@ -1291,15 +1296,15 @@ namespace Persistence.Migrations
                         {
                             Id = 4,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "06271632-a0d6-4556-ae9b-aa73622cbccb",
+                            ConcurrencyStamp = "24df6cde-7939-4258-88ac-cf102e20ebd7",
                             Email = "employee2@demo.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "EMPLOYEE2@DEMO.COM",
                             NormalizedUserName = "EMPLOYEE2@DEMO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPlfjl2K3m/cXyAyi/2ECR39LdGeU1PHySoVCE3KceA+G/uP73Qq1+lLa8FBi+cLsQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIl2KxDTkFeXvT8LqazKRqDi0EmM7rH/c8LfFIPRdBEL2fFRhJnPBEUxaCa4y6bNmg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "63372ba7-eaaa-450b-8f66-08ced363236a",
+                            SecurityStamp = "672fcc43-895f-4757-833c-705aa79fddbd",
                             TwoFactorEnabled = false,
                             UserName = "employee2@demo.com"
                         });
