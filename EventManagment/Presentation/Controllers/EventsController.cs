@@ -31,10 +31,9 @@ public class EventsController(IEventService eventService) : ControllerBase
     public async Task<ActionResult<EventFiltersMetaResponseDto>> GetMeta(
     CancellationToken cancellationToken)
     {
-        //   var currentUser = this.User.FindFirstValue("Sid");
-        var userId = 1;
+   
 
-        var meta = await eventService.GetFiltersMetaAsync(userId, cancellationToken);
+        var meta = await eventService.GetFiltersMetaAsync(GetCurrentUserId(), cancellationToken);
 
         return Ok(meta.Adapt<EventFiltersMetaResponseDto>());
     }
@@ -45,10 +44,9 @@ public class EventsController(IEventService eventService) : ControllerBase
         [FromQuery] EventsSearchRequestDto query,
         CancellationToken ct)
     {
-        var userId = 4; // later from JWT
-
+       
         var filters = query.Adapt<EventsSearchFilters>();
-        var result = await eventService.GetEventsAsync(userId, filters, ct);
+        var result = await eventService.GetEventsAsync(GetCurrentUserId(), filters, ct);
 
         return Ok(result.Adapt<EventsSearchResponse>());
     }
@@ -59,9 +57,8 @@ public class EventsController(IEventService eventService) : ControllerBase
         [FromQuery] bool withCounts = false,
         CancellationToken ct = default)
     {
-        var userId = 1; // later from JWT
 
-        var result = await eventService.GetCategoriesAsync(userId, withCounts, ct);
+        var result = await eventService.GetCategoriesAsync(GetCurrentUserId(), withCounts, ct);
 
         return Ok(result.Adapt<CategoriesResponse>());
     }
@@ -72,9 +69,8 @@ public class EventsController(IEventService eventService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EventDetailsResponse>> GetById([FromRoute] int eventId, CancellationToken ct)
     {
-        var userId = 1;
 
-        var result = await eventService.GetEventDetailsAsync(userId, eventId, ct);
+        var result = await eventService.GetEventDetailsAsync(GetCurrentUserId(), eventId, ct);
         return result is null
             ? NotFound()
             : Ok(result.Adapt<EventDetailsResponse>());
@@ -88,10 +84,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     {
         try
         {
-            var currentUser = this.User.FindFirstValue("Sid");
-            var userId = 1;
-
-            await eventService.RegisterOnEventAsync(userId, eventId, ct);
+            await eventService.RegisterOnEventAsync(GetCurrentUserId(), eventId, ct);
             return NoContent();
         }
         catch (InvalidOperationException ex)
@@ -112,10 +105,9 @@ public class EventsController(IEventService eventService) : ControllerBase
     {
         try
         {
-            var currentUser = this.User.FindFirstValue("Sid");
-            var userId = 1;
+        
 
-            await eventService.UnregisterFromEventAsync(userId, eventId, ct);
+            await eventService.UnregisterFromEventAsync(GetCurrentUserId(), eventId, ct);
             return NoContent();
         }
         catch (InvalidOperationException ex)
@@ -142,7 +134,8 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]    [Route("api/events/update-event")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]  
+    [Route("update-event")]
     public async Task<IActionResult> UpdateEvent([FromBody] UpdateEventRequest request,
         CancellationToken cancellationToken)
     {
@@ -221,12 +214,15 @@ public class EventsController(IEventService eventService) : ControllerBase
     [FromQuery] EventsSearchRequestDto query,
     CancellationToken ct)
     {
-        var userId = 1;
         var filters = query.Adapt<EventsSearchFilters>();
 
-        var csv = await eventService.GetEventsAsCsvAsync(userId, filters, ct);
+        var csv = await eventService.GetEventsAsCsvAsync(GetCurrentUserId(), filters, ct);
 
         return File(csv, "text/csv", "events.csv");
     }
 
+    private int GetCurrentUserId()
+    {
+       return int.Parse(User.FindFirstValue("Sid")??"1");
+    }
 }

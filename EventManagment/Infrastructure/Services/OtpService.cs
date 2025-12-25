@@ -31,7 +31,6 @@ public sealed class OtpService : IOtpService
 
     public async Task<bool> ValidateOtpAsync(string phoneNumber, string code)
     {
-
         var cachedCode = await _cache.GetStringAsync($"otp:{phoneNumber}");
         if (cachedCode == code)
         {

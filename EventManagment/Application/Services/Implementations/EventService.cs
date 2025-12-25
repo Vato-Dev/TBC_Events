@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Application.Services.Implementations;
 
-public class EventService(IEventRepository repository , ICurrentUserService currentUser) : IEventService
+public class EventService(IEventRepository repository , ICurrentUserService currentUser, INotificationService notificationService) : IEventService
 {
     public Task<int> CreateEventAsync(CreateEventRequest request, CancellationToken cancellationToken)
     {
@@ -84,6 +84,10 @@ public class EventService(IEventRepository repository , ICurrentUserService curr
     {
        var result =  await repository.UpdateEventAsync(request, ct);
        if(result is null) throw new Exception("Event not found");
+       if (request.NotificationSettings.HasFlag(NotificationSettings.EventUpdates))
+       {
+           _ = notificationService.NotifyParticipantsAboutUpdate(request.Id, request.Title); 
+       }
        return result.Value;
     }
     
