@@ -68,5 +68,17 @@ public class EventService(IEventRepository repository , ICurrentUserService curr
              throw new NotFoundException();
          return result.Value;
     }
+    
+    public async Task DeleteEventAsync(int eventId, CancellationToken cancellationToken)
+    {
+        await repository.DeleteEventAsync(eventId, cancellationToken);
+    }
+
+    public async Task<Event> GetEventByIdAsyncc(int eventId, CancellationToken cancellationToken)
+    {
+        var @event =  await repository.GetEventByIdAsync(eventId, cancellationToken);
+        if(@event is null) throw new NotFoundException();
+        return @event;
+    }
 }
 
