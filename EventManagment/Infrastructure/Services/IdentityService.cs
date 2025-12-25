@@ -2,12 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using Application.DTOs;
 using Application.IdentityModels.Results;
 using Application.Models;
-using Application.Repositories;
 using Application.Services.Abstractions;
 using Domain.Models;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Persistence.IdentityModels;
 
@@ -19,9 +17,7 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
     IOtpService otpService,
     TokenService tokenService,  
     IEmailSender emailSender,
-    ISmsSender smsSender,
-    IUserRepository userRepository,
-    IServiceScopeFactory scopeFactory)
+    ISmsSender smsSender)
     : IIdentityService
 {
     public async Task<AuthResult> AuthenticateAsync(string email, string password) //Response request models
@@ -39,7 +35,7 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
             return AuthResult.Failed([new ApplicationError("Not Allowed","Could be Invalid Email or Password, Try again")]);
         }
 
-        return AuthResult.Succeed(await CreateTokenResponse(user));
+        return AuthResult.Succeed(await CreateTokenResponse(user), user.Id, user.UserName!);
     }
 
     public async Task<RegisterResult> RegisterAsync(string email, string password, string userName, [Phone]string phoneNumber,
@@ -51,31 +47,6 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
         if (!result.Succeeded) 
             return RegisterResult.Failed(result.Errors.Adapt<ApplicationError[]>());
         
-        var addRoleTask = userManager.AddToRoleAsync(user, Roles.Employee);
-        var tokenTask = CreateTokenResponse(user);
-        _ = Task.Run(async () =>
-        {
-            using var scope = scopeFactory.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-
-            try
-            {
-                await repo.CreateUserAsync(new User
-                {
-                    Department = department,
-                    Email = email,
-                    CreatedAt = DateTime.UtcNow,
-                    FullName = userName,
-                    IsActive = true,
-                    Role = UserRole.Employee
-                }, CancellationToken.None);
-            }
-            catch (Exception ex)
-            {
-                //Todo loger
-            }
-        });
-        await Task.WhenAll(addRoleTask, tokenTask); 
         return !result.Succeeded ? RegisterResult.Failed(result.Errors.Adapt<ApplicationError[]>()) : RegisterResult.Success(user.Id , await CreateTokenResponse(user));
     }
 
