@@ -3,6 +3,9 @@ using Application.Mapping;
 using Application.Services.Abstractions;
 using Application.Services.Implementations;
 using Application.Extensions;
+using Application.Validators.Events;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infrastructure.BackGroundJobs;
 using Infrastructure.Mappings;
 using Infrastructure.Services;
@@ -28,6 +31,9 @@ DomainToEntityMappings.ConfigureMappings();
 IdentityErrorToApplicationMappings.ConfigureMappings();
 RequestsToDomain.ConfigureMappings();
 
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateEventRequestValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
