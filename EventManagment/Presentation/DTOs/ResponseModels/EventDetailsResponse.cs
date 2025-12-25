@@ -20,7 +20,7 @@ namespace Presentation.DTOs.ResponseModels
         public int RegisteredUsers { get; init; }
         public int CurrentWaitlist { get; init; }
         public bool IsActive { get; init; }
-        public RegistrationStatus MyStatus { get; init; }
+        public MyStatus MyStatus { get; init; }
         public IReadOnlyList<string> FeaturedSpeakers { get; init; } = Array.Empty<string>();
         public EventTypeDto EventType { get; init; } = null!;
         public OrganizerDto Organizer { get; init; } = null!;
