@@ -1,6 +1,6 @@
+using Infrastructure.BackGroundJobs;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
-namespace Infrastructure.BackGroundJobs;
 
 public static class ConfigureBackgroundJobs 
 {
@@ -8,18 +8,20 @@ public static class ConfigureBackgroundJobs
     {
         services.AddQuartz(config =>
         {
+            config.UseMicrosoftDependencyInjectionJobFactory(); 
+
             var interval = TimeSpan.FromMinutes(15);
 
             config
-                .AddJob<NotifyJob>(NotifyJob.Key, job => { job.StoreDurably(); })
-                .AddTrigger(trigger => trigger
+                .AddJob<NotifyJob>(opts => opts.WithIdentity(NotifyJob.Key))
+                .AddTrigger(opts => opts
                     .ForJob(NotifyJob.Key)
-                    .WithSimpleSchedule(schedule => schedule
+                    .WithIdentity("Notify_Events_Trigger")
+                    .WithSimpleSchedule(x => x
                         .WithInterval(interval)
                         .RepeatForever()));
-            config.UseInMemoryStore();
-
         });
-        services.AddQuartzHostedService();
+
+        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
     }
 }

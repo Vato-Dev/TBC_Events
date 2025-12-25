@@ -17,7 +17,7 @@ public class NotifyJob(AppDbContext repository,IEmailSender emailSender) : IJob
     public async Task Execute(IJobExecutionContext context)
     {
         var now = DateTime.Now;
-        var upcomingEvents = await repository.Events
+        var upcomingEvents = await repository.Events//it's horrible ,but still
             .Where(e => e.StartDateTime > now && e.StartDateTime <= now.AddHours(24))
             .Where(e => (e.NotificationSettings & (NotificationSettings.OneHourBeforeReminder | NotificationSettings.TwentyForHourBeforeReminder)) != 0)
             .Include(e => e.Registrations)
