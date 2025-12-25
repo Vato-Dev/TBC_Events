@@ -31,5 +31,51 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         builder.HasOne(u => u.ApplicationUser)
             .WithOne()
             .HasForeignKey<UserEntity>(u => u.Id);
+
+        var seedTime = new DateTime(2025, 12, 24, 0, 0, 0, DateTimeKind.Utc);
+
+        builder.HasData(
+            new UserEntity
+            {
+                Id = 1,
+                Email = "admin@demo.com",
+                FullName = "Demo Admin",
+                IsActive = true,
+                Role = UserRole.Admin,
+                Department = Department.Engineering,
+                CreatedAt = seedTime
+            },
+            new UserEntity
+            {
+                Id = 2,
+                Email = "organizer@demo.com",
+                FullName = "Demo Organizer",
+                IsActive = true,
+                Role = UserRole.Organizer,
+                Department = Department.HR,
+                CreatedAt = seedTime
+            },
+            new UserEntity
+            {
+                Id = 3,
+                Email = "employee1@demo.com",
+                FullName = "Demo Employee 1",
+                IsActive = true,
+                Role = UserRole.Employee,
+                Department = Department.Design,
+                CreatedAt = seedTime
+            },
+            new UserEntity
+            {
+                Id = 4,
+                Email = "employee2@demo.com",
+                FullName = "Demo Employee 2",
+                IsActive = true,
+                Role = UserRole.Employee,
+                Department = Department.Marketing,
+                CreatedAt = seedTime
+            }
+        );
+
     }
 }

@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Application.Mapping;
 using Application.Services.Abstractions;
 using Application.Services.Implementations;
+using Application.Extensions;
 using Infrastructure.Mappings;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,7 @@ RequestsToDomain.ConfigureMappings();
     options.Configuration = "localhost:6379"; //mt ADRESS IF I ONLY COULS FIX MY DOCKER CONTAINER BRUH
     options.InstanceName = "Otp_"; //PREFIX
 });*/
-
+builder.Services.AddApplicationServices();
 builder.Services.AddJwtBearerAuthentication(builder.Configuration);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

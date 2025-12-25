@@ -16,6 +16,13 @@ public class RegistrationStatusConfiguration : IEntityTypeConfiguration<Registra
 
         builder.Property(e => e.Description).HasMaxLength(200);
         builder.Property(e => e.Name).HasMaxLength(50);
-        
+
+        builder.HasData(
+            new RegistrationStatusEntity { Id = 1, Name = "Pending", Description = "Awaiting approval" },
+            new RegistrationStatusEntity { Id = 2, Name = "Waitlisted", Description = "No spots currently available" },
+            new RegistrationStatusEntity { Id = 3, Name = "Cancelled", Description = "Registration cancelled" },
+            new RegistrationStatusEntity { Id = 4, Name = "Confirmed", Description = "Spot confirmed" }
+        );
+
     }
 }
