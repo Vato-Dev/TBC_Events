@@ -18,4 +18,6 @@ public interface IEventRepository
     Task<int?> UpdateEventAsync(UpdateEventRequest request, CancellationToken cancellationToken);
     Task<int?> UpdateAgendaItemAsync(UpdateAgendaRequest request, CancellationToken cancellationToken);
     Task<EventRegistrationsGroupedDto> GetEventRegistrationsGroupedAsync(int eventId, CancellationToken ct = default);
+    Task DeleteEventAsync(int eventId, CancellationToken cancellationToken);
+
 }

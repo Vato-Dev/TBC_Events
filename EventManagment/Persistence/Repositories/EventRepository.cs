@@ -131,7 +131,11 @@ public class EventRepository(AppDbContext context)  : IEventRepository
 
     public async Task DeleteEventAsync(int eventId, CancellationToken cancellationToken)
     {
+        var rowsAffected = await context.Events
+            .Where(e => e.Id == eventId)
+            .ExecuteUpdateAsync(s => s.SetProperty(e => e.IsActive, false), cancellationToken);
 
+        if (rowsAffected == 0) return;
     }
 
     public async Task UnregisterFromEventAsync(int userId, int eventId, CancellationToken ct)

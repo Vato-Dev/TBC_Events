@@ -1,5 +1,6 @@
 ﻿using Application.Requests.Events;
 using Application.DTOs;
+using Domain.Models;
 
 namespace Application.Services.Abstractions;
 
@@ -15,5 +16,7 @@ public interface IEventService
     Task<EventDetails?> GetEventDetailsAsync(int customerId, int eventId, CancellationToken ct);
     Task RegisterOnEventAsync(int customerId, int eventId, CancellationToken ct = default);
     Task UnregisterFromEventAsync(int customerId, int eventId, CancellationToken ct = default);
+    Task DeleteEventAsync(int eventId, CancellationToken cancellationToken);
+    Task<Event> GetEventByIdAsyncc(int eventId, CancellationToken cancellationToken);
 
 }
