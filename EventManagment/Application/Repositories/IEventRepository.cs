@@ -11,4 +11,5 @@ public interface IEventRepository
     public Task<int?> AddEventAgendaAsync(int eventId, AgendaItem agenda, CancellationToken ct);
     Task<int?> UpdateEventAsync(UpdateEventRequest request, CancellationToken cancellationToken);
     Task<int?> UpdateAgendaItemAsync(UpdateAgendaRequest request, CancellationToken cancellationToken);
+    Task DeleteEventAsync(int eventId, CancellationToken cancellationToken);
 }

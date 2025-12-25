@@ -10,6 +10,14 @@ namespace Presentation.Controllers;
 [Route("api/events")]
 public class EventsController(IEventService eventService) : ControllerBase
 {
+
+    [HttpGet]
+    [Route("api/events/{eventId:int}")]
+    public async Task<IActionResult> GetEventByIdAsync(int eventId, CancellationToken cancellationToken)
+    {
+        return Ok(await eventService.GetEventByIdAsyncc(eventId, cancellationToken));
+    }
+    
     [HttpPost]
     [Route("api/events/create-event")]
     public async Task<IActionResult> CreateEvent([FromBody] CreateEventRequest request,
@@ -42,5 +50,13 @@ public class EventsController(IEventService eventService) : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(await eventService.UpdateAgendaItemAsync(request, cancellationToken));
+    }
+
+    [HttpDelete]
+    [Route("api/events/delete-event")]
+    public async Task<IActionResult> DeleteEventAsync(int eventId, CancellationToken cancellationToken)
+    {
+        await eventService.DeleteEventAsync(eventId, cancellationToken);
+        return NoContent();
     }
 }
