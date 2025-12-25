@@ -1,4 +1,6 @@
 using Domain.Models;
+using Application.DTOs;
+using Application.Requests.Events;
 
 namespace Application.Repositories;
 
@@ -15,4 +17,5 @@ public interface IEventRepository
     public Task<int?> AddEventAgendaAsync(int eventId, AgendaItem agenda, CancellationToken ct);
     Task<int?> UpdateEventAsync(UpdateEventRequest request, CancellationToken cancellationToken);
     Task<int?> UpdateAgendaItemAsync(UpdateAgendaRequest request, CancellationToken cancellationToken);
+    Task<EventRegistrationsGroupedDto> GetEventRegistrationsGroupedAsync(int eventId, CancellationToken ct = default);
 }

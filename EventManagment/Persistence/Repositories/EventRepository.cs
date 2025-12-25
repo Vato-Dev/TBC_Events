@@ -9,13 +9,131 @@ using Mapster;
 using Persistence.Data;
 using Persistence.Entities;
 using Persistence.Mappings;
-using System.Diagnostics;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
-
 namespace Persistence.Repositories;
-public class EventRepository(AppDbContext context) : IEventRepository
+
+public class EventRepository(AppDbContext context)  : IEventRepository
 {
+    public async Task<EventRegistrationsGroupedDto> GetEventRegistrationsGroupedAsync(int eventId, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<int> CreateEventAsync(Event @event, List<int> tagIds, CancellationToken cancellationToken)
+    {
+        var entity = @event.Adapt<EventEntity>();
+        entity.EventTags = tagIds.Select<int, EventTagEntity>(id => new EventTagEntity { TagId = id }).ToList();
+        await context.AddAsync(entity, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+        return entity.Id;
+    }
+
+    public async Task<Event> GetEventByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        var entity = await context.Events.Include(e => e.Agendas).SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
+        var @event = entity.Adapt<Event>();
+        return @event;
+    }
+
+    public async Task<int?> UpdateEventAsync(UpdateEventRequest request, CancellationToken cancellationToken) //Performance was dead so i throwed out my "Perfect architecture" with 3 mappings
+    {
+        var entity = await context.Events
+            .Include(e => e.EventTags)
+            .SingleOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+
+        if (entity == null) return null;
+
+        request.Adapt(entity);
+        entity.UpdatedAt = DateTime.UtcNow;
+        var tagsToRemove = entity.EventTags
+            .Where(et => !request.TagIds.Contains(et.TagId))
+            .ToList();
+
+        foreach (var tag in tagsToRemove)
+            entity.EventTags.Remove(tag);
+
+        var existingTagIds = entity.EventTags.Select(et => et.TagId).ToList();
+        var tagsToAdd = request.TagIds
+            .Where(id => !existingTagIds.Contains(id))
+            .Select(id => new EventTagEntity { EventId = entity.Id, TagId = id });
+
+        foreach (var newTag in tagsToAdd)
+            entity.EventTags.Add(newTag);
+
+        context.Update(entity);
+        return await context.SaveChangesAsync(cancellationToken);
+    }
+    public async Task<int?> AddEventAgendaAsync( //result pattern jobda
+        int eventId,
+        AgendaItem agenda,
+        CancellationToken cancellationToken)
+    {
+        var existingEntity = await context.Events
+            .Include(e => e.Agendas)
+            .ThenInclude(a => a.Tracks)
+            .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
+
+        if (existingEntity == null) return null;
+
+        var agendaEntity = agenda.Adapt<AgendaItemEntity>();
+
+        agendaEntity.EventId = existingEntity.Id;
+        agendaEntity.Event = existingEntity;
+
+        foreach (var track in agendaEntity.Tracks)
+        {
+            track.AgendaItem = agendaEntity;
+        }
+
+        existingEntity.Agendas.Add(agendaEntity);
+
+        await context.SaveChangesAsync(cancellationToken);
+        return agendaEntity.Id;
+    }
+
+    public async Task<int?> UpdateAgendaItemAsync(UpdateAgendaRequest request, CancellationToken cancellationToken)
+    {
+        var entity = await context.Agendas
+            .Include(a => a.Tracks)
+            .SingleOrDefaultAsync(a => a.Id == request.AgendaId, cancellationToken);
+
+
+        if (entity == null) return null;
+
+        request.Adapt(entity);
+
+        var requestTrackIds = request.Tracks.Where(t => t.Id > 0).Select(t => t.Id).ToList();
+        var tracksToRemove = entity.Tracks
+            .Where(t => !requestTrackIds.Contains(t.Id))
+            .ToList();
+
+        foreach (var track in tracksToRemove)
+            entity.Tracks.Remove(track); // there is an issue if track does not exist? it's error
+
+        foreach (var trackDto in request.Tracks)
+        {
+            if (trackDto.Id > 0)
+            {
+                var existingTrack = entity.Tracks.FirstOrDefault(t => t.Id == trackDto.Id);
+                if (existingTrack != null)
+                {
+                    trackDto.Adapt(existingTrack);
+                }
+            }
+            else
+            {
+                var newTrack = trackDto.Adapt<AgendaTrackEntity>();
+                entity.Tracks.Add(newTrack);
+            }
+        }
+        await context.SaveChangesAsync(cancellationToken);
+        return entity.Id;
+    }
+
+    public async Task DeleteEventAsync(int eventId, CancellationToken cancellationToken)
+    {
+
+    }
+
     public async Task UnregisterFromEventAsync(int userId, int eventId, CancellationToken ct)
     {
         var cancelledStatusId = await context.RegistrationStatuses
@@ -23,72 +141,6 @@ public class EventRepository(AppDbContext context) : IEventRepository
             .Select(x => x.Id)
             .SingleAsync(ct);
 
-public class EventRepository(AppDbContext context)  : IEventRepository
-{
-     public async Task<int> CreateEventAsync(Event @event,List<int>tagIds, CancellationToken cancellationToken)
-     {
-        var entity = @event.Adapt<EventEntity>();
-        entity.EventTags = tagIds.Select<int, EventTagEntity>(id => new EventTagEntity { TagId = id }).ToList();
-        await context.AddAsync(entity, cancellationToken); 
-        await context.SaveChangesAsync(cancellationToken);
-        return entity.Id;
-     }
-     
-     public async Task<Event> GetEventByIdAsync(int id, CancellationToken cancellationToken)
-     {
-         var entity = await context.Events.Include(e=>e.Agendas).SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
-         var @event = entity.Adapt<Event>();
-         return @event;
-     }
-
-     public async Task<int?> UpdateEventAsync(UpdateEventRequest request, CancellationToken cancellationToken) //Performance was dead so i throwed out my "Perfect architecture" with 3 mappings
-     { 
-         var entity = await context.Events
-             .Include(e => e.EventTags)
-             .SingleOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
-
-         if (entity == null) return null;
- 
-         request.Adapt(entity);
-         entity.UpdatedAt = DateTime.UtcNow;
-         var tagsToRemove = entity.EventTags
-             .Where(et => !request.TagIds.Contains(et.TagId))
-             .ToList();
-    
-         foreach (var tag in tagsToRemove)
-             entity.EventTags.Remove(tag);
-
-         var existingTagIds = entity.EventTags.Select(et => et.TagId).ToList();
-         var tagsToAdd = request.TagIds
-             .Where(id => !existingTagIds.Contains(id))
-             .Select(id => new EventTagEntity { EventId = entity.Id, TagId = id });
-
-         foreach (var newTag in tagsToAdd)
-             entity.EventTags.Add(newTag);
-
-         context.Update(entity);
-        return await context.SaveChangesAsync(cancellationToken);
-     }
-     public async Task<int?> AddEventAgendaAsync( //result pattern jobda
-         int eventId,
-         AgendaItem agenda,
-         CancellationToken cancellationToken)
-     {
-         var existingEntity = await context.Events
-             .Include(e => e.Agendas)
-             .ThenInclude(a => a.Tracks)
-             .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
-
-         if (existingEntity == null) return null;
-
-         var agendaEntity = agenda.Adapt<AgendaItemEntity>();
-
-         agendaEntity.EventId = existingEntity.Id;
-         agendaEntity.Event = existingEntity;
-
-         foreach (var track in agendaEntity.Tracks)
-         {
-             track.AgendaItem = agendaEntity;
         var existing = await context.Registrations
             .Include(r => r.StatusEntity)
             .FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId, ct);
@@ -131,10 +183,9 @@ public class EventRepository(AppDbContext context)  : IEventRepository
         throw new InvalidOperationException("Operation invalid: unknown registration status.");
     }
 
-
     public async Task RegisterOnEventAsync(int userId, int eventId, CancellationToken ct)
     {
-        // optional: ensure event exists (recommended)
+        // optional: ensure event exists
         var eventExists = await context.Events
             .AsNoTracking()
             .AnyAsync(e => e.Id == eventId, ct);
@@ -142,17 +193,20 @@ public class EventRepository(AppDbContext context)  : IEventRepository
         if (!eventExists)
             throw new KeyNotFoundException($"Event with id {eventId} not found.");
 
-        var registration = await context.Registrations
+        var existing = await context.Registrations
+            .Include(r => r.StatusEntity)
             .FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId, ct);
 
-        if (registration is null)
+        if (existing is null)
         {
-            // new registration -> Waitlisted
+            var waitlistedStatus = await context.RegistrationStatuses
+                .SingleAsync(x => x.Name == "Waitlisted", ct);
+
             context.Registrations.Add(new RegistrationEntity
             {
                 EventId = eventId,
                 UserId = userId,
-                StatusId = 2, // Waitlisted
+                StatusEntity = waitlistedStatus,
                 RegisteredAt = DateTime.UtcNow,
                 CancelledAt = null
             });
@@ -161,40 +215,27 @@ public class EventRepository(AppDbContext context)  : IEventRepository
             return;
         }
 
-        // existing registration rules
-        if (registration.StatusId == 4 || registration.StatusId == 2)
-        {
-            // Confirmed or Waitlisted -> invalid
-            throw new InvalidOperationException("Operation invalid: user is already registered or waitlisted for this event.");
-        }
+        var statusName = existing.StatusEntity.Name;
 
-        if (registration.StatusId == 3)
+        if (statusName == "Confirmed" || statusName == "Waitlisted")
+            throw new InvalidOperationException(
+                "Operation invalid: user is already registered or waitlisted for this event."
+            );
+
+        if (statusName == "Cancelled")
         {
-            // Cancelled -> set to Waitlisted
-            registration.StatusId = 2;
-            registration.RegisteredAt = DateTime.UtcNow;
-            registration.CancelledAt = null;
+            var waitlistedStatus = await context.RegistrationStatuses
+                .SingleAsync(x => x.Name == "Waitlisted", ct);
+
+            existing.StatusEntity = waitlistedStatus;
+            existing.RegisteredAt = DateTime.UtcNow;
+            existing.CancelledAt = null;
 
             await context.SaveChangesAsync(ct);
             return;
         }
 
-        // If you ever add more statuses, you can decide what to do here.
-        throw new InvalidOperationException("Operation invalid: unsupported registration status.");
-    }
-    public async Task<int> CreateEventAsync(Event @event, List<int> tagIds, CancellationToken cancellationToken)
-    {
-        /* var entity = @event.Adapt<EventEntity>();
-         foreach (var tagId in tagIds)
-         {
-              context.EventTags.Add(new EventTagEntity
-             {
-                 EventId = entity.Id,
-                 TagId = tagId
-             });
-         }
-         context.Events.Add(entity);*/
-        throw new NotImplementedException();
+        throw new InvalidOperationException("Operation invalid: unknown registration status.");
     }
 
     public Task<EventDetails?> GetEventDetailsAsync(int userId, int eventId, CancellationToken cancellationToken)
@@ -301,17 +342,6 @@ public class EventRepository(AppDbContext context)  : IEventRepository
             })
             .SingleOrDefaultAsync(cancellationToken);
     }
-
-    public Task UpdateEventAsync(Event @event, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<Event> GetEventByIdAsync(int eventId, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
-
 
     public async Task<CategoriesResult> GetCategoriesAsync(
         int customerId,
@@ -593,8 +623,6 @@ public class EventRepository(AppDbContext context)  : IEventRepository
         return data.Select(x => new LookupCount(x.Id, x.Name, x.Count)).ToList();
     }
 
-
-
     private async Task<List<LookupCount>> GetLocationsAsync(
         IQueryable<EventEntity> activeEvents,
         CancellationToken ct)
@@ -617,8 +645,6 @@ public class EventRepository(AppDbContext context)  : IEventRepository
 
         return data.Select(x => new LookupCount(null, x.Name, x.Count)).ToList();
     }
-
-
 
     private async Task<List<LookupCount>> GetRegistrationStatusesAsync(
         IQueryable<EventEntity> activeEvents,
@@ -728,57 +754,12 @@ public class EventRepository(AppDbContext context)  : IEventRepository
         var myNotRegistered = totalActiveEvents - myEventIds.Count;
 
         return new List<LookupCount>
-    {
-        new(null, "Registered", myRegistered),
-        new(null, "Waitlisted", myWaitlisted),
-        new(null, "Not Registered", myNotRegistered),
-    };
+        {
+            new(null, "Registered", myRegistered),
+            new(null, "Waitlisted", myWaitlisted),
+            new(null, "Not Registered", myNotRegistered),
+        };
     }
 }
 
-         existingEntity.Agendas.Add(agendaEntity);
-
-         await context.SaveChangesAsync(cancellationToken);
-         return agendaEntity.Id;
-     }
-     
-     public async Task<int?> UpdateAgendaItemAsync(UpdateAgendaRequest request, CancellationToken cancellationToken)
-     {
-         var entity = await context.Agendas
-             .Include(a => a.Tracks)
-             .SingleOrDefaultAsync(a => a.Id == request.AgendaId, cancellationToken);
-
-       
-         if (entity == null) return null ;
-
-         request.Adapt(entity);
-
-         var requestTrackIds = request.Tracks.Where(t => t.Id > 0).Select(t => t.Id).ToList();
-         var tracksToRemove = entity.Tracks
-             .Where(t => !requestTrackIds.Contains(t.Id))
-             .ToList();
-
-         foreach (var track in tracksToRemove)
-             entity.Tracks.Remove(track); // there is an issue if track does not exist? it's error
-
-         foreach (var trackDto in request.Tracks)
-         {
-             if (trackDto.Id > 0)
-             {
-                 var existingTrack = entity.Tracks.FirstOrDefault(t => t.Id == trackDto.Id);
-                 if (existingTrack != null)
-                 {
-                     trackDto.Adapt(existingTrack);
-                 }
-             }
-             else
-             {
-                 var newTrack = trackDto.Adapt<AgendaTrackEntity>();
-                 entity.Tracks.Add(newTrack);
-             }
-         }
-         await context.SaveChangesAsync(cancellationToken);
-         return entity.Id;
-     }
-}
 
