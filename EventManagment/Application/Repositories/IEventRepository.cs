@@ -21,5 +21,7 @@ public interface IEventRepository
     Task ConfirmWaitlistedAsync(int eventId, int userId, CancellationToken ct);
     Task RejectWaitlistedAsync(int eventId, int userId, CancellationToken ct);
     Task DeleteEventAsync(int eventId, CancellationToken cancellationToken);
+    Task<bool> IsEventOwnerAsync(int userId, int eventId, CancellationToken ct = default);
+
 
 }

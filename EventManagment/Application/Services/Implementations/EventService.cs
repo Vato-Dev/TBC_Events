@@ -117,6 +117,9 @@ public class EventService(IEventRepository repository , ICurrentUserService curr
 
     public Task RejectWaitlistedAsync(int eventId, int userId, CancellationToken ct = default)
         => repository.RejectWaitlistedAsync(eventId, userId, ct);
+    public Task<bool> IsEventOwnerAsync(int userId, int eventId, CancellationToken ct = default)
+    => repository.IsEventOwnerAsync(userId, eventId, ct);
+
 
 }
 
