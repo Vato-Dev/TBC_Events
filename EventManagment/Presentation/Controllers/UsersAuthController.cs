@@ -33,7 +33,7 @@ public class UsersAuthController(IUserService userService) : ControllerBase
         var result = await userService.SendOtpCodeAsync(phoneNumber);
         if (result)
         {
-            return Ok();
+            return NoContent();
         }
 
         return BadRequest(); //aq uxeshad miweria bad request imitom rom error iqneba da Middlware daaswrebs yoveltvis

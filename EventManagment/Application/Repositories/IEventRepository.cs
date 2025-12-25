@@ -20,4 +20,6 @@ public interface IEventRepository
     Task<EventRegistrationsGroupedDto> GetEventRegistrationsGroupedAsync(int eventId, CancellationToken ct = default);
     Task ConfirmWaitlistedAsync(int eventId, int userId, CancellationToken ct);
     Task RejectWaitlistedAsync(int eventId, int userId, CancellationToken ct);
+    Task DeleteEventAsync(int eventId, CancellationToken cancellationToken);
+
 }
