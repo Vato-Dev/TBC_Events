@@ -24,5 +24,13 @@ public class EventTagConfiguration : IEntityTypeConfiguration<EventTagEntity>
         builder.HasOne(d => d.TagEntity).WithMany(p => p.EventTags)
             .HasForeignKey(d => d.TagId)
             .OnDelete(DeleteBehavior.ClientSetNull)
-            .HasConstraintName("FK__EventTags__TagId__5812160E");    }
+            .HasConstraintName("FK__EventTags__TagId__5812160E");
+
+        builder.HasData(
+            new EventTagEntity { Id = 1, EventId = 1, TagId = 5 }, // tech
+            new EventTagEntity { Id = 2, EventId = 2, TagId = 3 }, // free-food
+            new EventTagEntity { Id = 3, EventId = 2, TagId = 4 }  // networking
+        );
+
+    }
 }

@@ -33,5 +33,63 @@ public class RegistrationConfiguration : IEntityTypeConfiguration<RegistrationEn
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK__Registrat__UserI__5165187F");
+
+        builder.HasData(
+            // Confirmed registrations (match RegisteredUsers = 1)
+            new RegistrationEntity
+            {
+                Id = 1,
+                EventId = 1,
+                UserId = 3,
+                StatusId = 4, // Confirmed
+                RegisteredAt = new DateTime(2025, 9, 1, 10, 0, 0, DateTimeKind.Utc)
+            },
+            new RegistrationEntity
+            {
+                Id = 2,
+                EventId = 2,
+                UserId = 4,
+                StatusId = 4, // Confirmed
+                RegisteredAt = new DateTime(2025, 11, 20, 10, 0, 0, DateTimeKind.Utc)
+            },
+            new RegistrationEntity
+            {
+                Id = 3,
+                EventId = 4,
+                UserId = 3,
+                StatusId = 4, // Confirmed
+                RegisteredAt = new DateTime(2025, 11, 10, 10, 0, 0, DateTimeKind.Utc)
+            },
+            new RegistrationEntity
+            {
+                Id = 4,
+                EventId = 6,
+                UserId = 4,
+                StatusId = 4, // Confirmed
+                RegisteredAt = new DateTime(2025, 12, 10, 10, 0, 0, DateTimeKind.Utc)
+            }   ,
+
+            // Waitlisted
+            new RegistrationEntity
+            {
+                Id = 5,
+                EventId = 2,
+                UserId = 3,
+                StatusId = 2, // Waitlisted
+                RegisteredAt = new DateTime(2025, 11, 21, 10, 0, 0, DateTimeKind.Utc)
+            },
+
+            // Cancelled
+            new RegistrationEntity
+            {
+                Id = 6,
+                EventId = 1,
+                UserId = 4,
+                StatusId = 3, // Cancelled
+                RegisteredAt = new DateTime(2025, 8, 25, 10, 0, 0, DateTimeKind.Utc),
+                CancelledAt = new DateTime(2025, 8, 28, 10, 0, 0, DateTimeKind.Utc)
+            }
+        );
+
     }
 }

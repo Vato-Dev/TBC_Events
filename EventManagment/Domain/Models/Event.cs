@@ -12,6 +12,7 @@ public class Event
     public DateOnly RegistrationStart { get; set; }
     public DateOnly RegistrationEnd { get; set; }
     public Location Location { get; set; } = null!;
+    public NotificationSettings  NotificationSettings { get; set; }
     public int Capacity { get; set; } 
     public int RegisteredUsers { get; set; }
     public string? ImageUrl { get; set; }
@@ -92,4 +93,15 @@ public enum LocationType
     InPerson,
     Virtual,
     Hybrid
+}
+
+[Flags]
+public enum NotificationSettings //teoriashi samic meyofa
+{
+    None = 0,
+    RegistrationConfirmation = 1, // 00001
+    TwentyForHourBeforeReminder = 2,   // 00010
+    OneHourBeforeReminder = 4,     // 00100
+    WaitlistUpdates = 8,          // 01000
+    EventUpdates = 16             // 10000
 }

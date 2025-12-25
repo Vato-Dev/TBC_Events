@@ -42,6 +42,7 @@ public class UserService : IUserService
                 request.UserName,
                 request.PhoneNumber,
                 request.OneTimePassword,
+                request.Department,
                 ct
             );
 

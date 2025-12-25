@@ -17,7 +17,7 @@ public class EventEntity
     public DateOnly RegistrationStart { get; set; }
     public DateOnly RegistrationEnd { get; set; }
     public LocationEntity Location { get; set; } = null!;
-
+    public NotificationSettings NotificationSettings { get; set; }
     public int Capacity { get; set; }
     public int RegisteredUsers { get; set; }
     public string? ImageUrl { get; set; }

@@ -1,4 +1,5 @@
 using Application.DTOs;
+using Application.IdentityModels.Results;
 using Application.Models;
 using Application.Services.Abstractions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,7 +21,7 @@ public class UsersAuthController(IUserService userService) : ControllerBase
         var result = await userService.AuthenticateAsync(request);
         if (result.Succeeded)
         {
-            return Ok(result.Tokens);
+            return Ok(LoginResponse.Response(result)); //For Android
         }
 
         return BadRequest(result.Errors);
@@ -33,7 +34,7 @@ public class UsersAuthController(IUserService userService) : ControllerBase
         var result = await userService.SendOtpCodeAsync(phoneNumber);
         if (result)
         {
-            return Ok();
+            return NoContent();
         }
 
         return BadRequest(); //aq uxeshad miweria bad request imitom rom error iqneba da Middlware daaswrebs yoveltvis

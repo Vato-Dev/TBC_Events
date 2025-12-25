@@ -6,6 +6,7 @@ using Application.Services.Abstractions;
 using Domain.Models;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Persistence.IdentityModels;
 
 namespace Infrastructure.Services;
@@ -34,11 +35,11 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
             return AuthResult.Failed([new ApplicationError("Not Allowed","Could be Invalid Email or Password, Try again")]);
         }
 
-        return AuthResult.Succeed(await CreateTokenResponse(user));
+        return AuthResult.Succeed(await CreateTokenResponse(user), user.Id, user.UserName!);
     }
 
     public async Task<RegisterResult> RegisterAsync(string email, string password, string userName, [Phone]string phoneNumber,
-        string oneTimePassword, CancellationToken ct) //CancellationToken gadmoveci raxan standartia ar aqvs supporti samwuxarod da IsCancellationRequested gamoyeneba anti-pattern aris aq
+        string oneTimePassword,Department department,  CancellationToken ct) //CancellationToken gadmoveci raxan standartia ar aqvs supporti samwuxarod da IsCancellationRequested gamoyeneba anti-pattern aris aq
     {
         var user = new ApplicationUser { Email = email, UserName = userName, PhoneNumber = phoneNumber , PhoneNumberConfirmed = true, LastOtpSentTime = DateTime.UtcNow};
         
@@ -46,10 +47,6 @@ public sealed class IdentityService( //Todo since cancellation Token Does not wo
         if (!result.Succeeded) 
             return RegisterResult.Failed(result.Errors.Adapt<ApplicationError[]>());
         
-        var addRoleTask = userManager.AddToRoleAsync(user, Roles.Employee);
-        var tokenTask = CreateTokenResponse(user);
-
-        await Task.WhenAll(addRoleTask, tokenTask); 
         return !result.Succeeded ? RegisterResult.Failed(result.Errors.Adapt<ApplicationError[]>()) : RegisterResult.Success(user.Id , await CreateTokenResponse(user));
     }
 
