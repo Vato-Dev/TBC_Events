@@ -13,9 +13,126 @@ namespace Persistence.Repositories;
 
 public class EventRepository(AppDbContext context)  : IEventRepository
 {
-    public async Task<EventRegistrationsGroupedDto> GetEventRegistrationsGroupedAsync(int eventId, CancellationToken ct = default)
+    public async Task ConfirmWaitlistedAsync(int eventId, int userId, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var waitlistedStatusId = await context.RegistrationStatuses
+            .Where(x => x.Name == "Waitlisted")
+            .Select(x => x.Id)
+            .SingleAsync(ct);
+
+        var confirmedStatusId = await context.RegistrationStatuses
+            .Where(x => x.Name == "Confirmed")
+            .Select(x => x.Id)
+            .SingleAsync(ct);
+
+        var existing = await context.Registrations
+            .Include(r => r.StatusEntity)
+            .FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId, ct);
+
+        if (existing is null)
+            throw new InvalidOperationException("Operation invalid: registration not found.");
+
+        var statusName = existing.StatusEntity.Name;
+
+        if (statusName != "Waitlisted")
+            throw new InvalidOperationException("Operation invalid: only waitlisted users can be confirmed.");
+
+        // optional but recommended: keep Event.RegisteredUsers consistent
+        var ev = await context.Events.FirstOrDefaultAsync(e => e.Id == eventId, ct);
+        if (ev is null)
+            throw new InvalidOperationException("Operation invalid: event not found.");
+
+        if (ev.RegisteredUsers >= ev.Capacity)
+            throw new InvalidOperationException("Operation invalid: event capacity is full.");
+
+        existing.StatusId = confirmedStatusId;
+        existing.CancelledAt = null;
+        existing.RegisteredAt ??= DateTime.UtcNow;
+
+        ev.RegisteredUsers += 1;
+
+        await context.SaveChangesAsync(ct);
+    }
+
+    public async Task RejectWaitlistedAsync(int eventId, int userId, CancellationToken ct)
+    {
+        var cancelledStatusId = await context.RegistrationStatuses
+            .Where(x => x.Name == "Cancelled")
+            .Select(x => x.Id)
+            .SingleAsync(ct);
+
+        var existing = await context.Registrations
+            .Include(r => r.StatusEntity)
+            .FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId, ct);
+
+        if (existing is null)
+            throw new InvalidOperationException("Operation invalid: registration not found.");
+
+        var statusName = existing.StatusEntity.Name;
+
+        if (statusName != "Waitlisted")
+            throw new InvalidOperationException("Operation invalid: user is not waitlisted.");
+
+        existing.StatusId = cancelledStatusId;
+        existing.CancelledAt = DateTime.UtcNow;
+
+        await context.SaveChangesAsync(ct);
+    }
+
+    public async Task<EventRegistrationsGroupedDto> GetEventRegistrationsGroupedAsync(
+        int eventId,
+        CancellationToken ct = default)
+    {
+        var rows = await context.Registrations
+            .AsNoTracking()
+            .Where(r => r.EventId == eventId)
+            .Select(r => new
+            {
+                UserId = r.UserEntity.Id,
+                r.UserEntity.Email,
+                r.UserEntity.FullName,
+                r.UserEntity.Department,
+                StatusName = r.StatusEntity.Name,
+                CreatedAt = r.RegisteredAt ?? r.CancelledAt
+            })
+            .ToListAsync(ct);
+
+        var grouped = rows
+            .Select(x => new
+            {
+                Status = x.StatusName.MapMyStatus(),
+                User = new RegistrationUserDto
+                {
+                    Id = x.UserId,
+                    Email = x.Email,
+                    FullName = x.FullName,
+                    Department = x.Department,
+                    Status = x.StatusName.MapMyStatus(),
+                    CreatedAt = x.CreatedAt ?? DateTime.MinValue
+                }
+            })
+            .Where(x => x.Status != MyStatus.NOT_REGISTERED)
+            .GroupBy(x => x.Status)
+            .ToDictionary(
+                g => g.Key,
+                g => new RegistrationStatusGroupDto
+                {
+                    TotalCount = g.Count(),
+                    Users = g
+                        .Select(z => z.User)
+                        .OrderByDescending(u => u.CreatedAt)
+                        .ToList()
+                });
+
+        EnsureGroup(grouped, MyStatus.CONFIRMED);
+        EnsureGroup(grouped, MyStatus.WAITLISTED);
+        EnsureGroup(grouped, MyStatus.CANCELLED);
+
+        return new EventRegistrationsGroupedDto
+        {
+            EventId = eventId,
+            Groups = grouped
+        };
     }
 
     public async Task<int> CreateEventAsync(Event @event, List<int> tagIds, CancellationToken cancellationToken)
@@ -760,6 +877,19 @@ public class EventRepository(AppDbContext context)  : IEventRepository
             new(null, "Not Registered", myNotRegistered),
         };
     }
+
+    private static void EnsureGroup(Dictionary<MyStatus, RegistrationStatusGroupDto> groups, MyStatus status)
+    {
+        if (!groups.ContainsKey(status))
+        {
+            groups[status] = new RegistrationStatusGroupDto
+            {
+                TotalCount = 0,
+                Users = new List<RegistrationUserDto>()
+            };
+        }
+    }
+
 }
 
 

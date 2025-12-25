@@ -8,6 +8,7 @@ using Presentation.DTOs.RequestModels;
 using Presentation.DTOs.ResponseModels;
 using System.Security.Claims;
 using Mapster;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 
 namespace Presentation.Controllers;
@@ -95,7 +96,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpDelete("{eventId:int}/registrations")]
-    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+  //  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Unregister([FromRoute] int eventId, CancellationToken ct)
@@ -141,10 +142,60 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpPost]
+   // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/events/update-agenda")]
     public async Task<IActionResult> UpdateAgendaToEvent(UpdateAgendaRequest request,
         CancellationToken cancellationToken)
     {
         return Ok(await eventService.UpdateAgendaItemAsync(request, cancellationToken));
+    }
+
+    [HttpGet("{eventId:int}/registrations/grouped")]
+   // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [ProducesResponseType(typeof(EventRegistrationsGroupedDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<EventRegistrationsGroupedDto>> GetRegistrationsGrouped(
+    [FromRoute] int eventId,
+    CancellationToken ct)
+    {
+        var result = await eventService.GetEventRegistrationsGroupedAsync(eventId, ct);
+        return Ok(result.Adapt<EventRegistrationsGroupedResponseDto>());
+    }
+
+    [HttpPost("{eventId:int}/registrations/{userId:int}/confirm")]
+  //  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // optionally restrict to admins
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ConfirmWaitlisted(
+    [FromRoute] int eventId,
+    [FromRoute] int userId,
+    CancellationToken ct)
+    {
+        try
+        {
+            await eventService.ConfirmWaitlistedAsync(eventId, userId, ct);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("{eventId:int}/waitlist/{userId:int}/reject")]
+  //  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // e.g. policy/role later
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> RejectWaitlisted(
+    [FromRoute] int eventId,
+    [FromRoute] int userId,
+    CancellationToken ct)
+    {
+        try
+        {
+            await eventService.RejectWaitlistedAsync(eventId, userId, ct);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }
