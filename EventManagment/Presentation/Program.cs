@@ -6,11 +6,13 @@ using Application.Extensions;
 using Infrastructure.BackGroundJobs;
 using Infrastructure.Mappings;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
 using Persistence.Mappings;
 using Presentation;
 using Presentation.Extensions;
+using Presentation.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDistributedMemoryCache();
@@ -73,6 +75,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors(corsPolicyBuilder => corsPolicyBuilder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseMiddleware<GlobalErrorHandlingMiddleWare>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -20,6 +20,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     
     
     [HttpGet]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("test/{eventId:int}")]
     public async Task<IActionResult> GetEventByIdAsync(int eventId, CancellationToken cancellationToken)
     {
@@ -27,7 +28,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
     
     [HttpGet("filters-meta")]
-    //   [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<EventFiltersMetaResponseDto>> GetMeta(
     CancellationToken cancellationToken)
     {
@@ -39,7 +40,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpGet]
-    //   [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<EventsSearchResponse>> GetEvents(
         [FromQuery] EventsSearchRequestDto query,
         CancellationToken ct)
@@ -52,7 +53,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpGet("categories")]
-    //  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<CategoriesResponse>> GetCategories(
         [FromQuery] bool withCounts = false,
         CancellationToken ct = default)
@@ -64,7 +65,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpGet("{eventId:int}")]
-    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType(typeof(EventDetailsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EventDetailsResponse>> GetById([FromRoute] int eventId, CancellationToken ct)
@@ -77,7 +78,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpPost("{eventId:int}/registrations")]
-    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromRoute] int eventId, CancellationToken ct)
@@ -98,7 +99,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpDelete("{eventId:int}/registrations")]
-  //  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Unregister([FromRoute] int eventId, CancellationToken ct)
@@ -117,6 +118,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("create-event")]
     public async Task<IActionResult> CreateEvent([FromBody] CreateEventRequest request,
         CancellationToken cancellationToken)
@@ -125,6 +127,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("{eventId:int}/create-agenda")]
     public async Task<IActionResult> CreateAgendaToEvent(int eventId, CreateAgendaRequest request,
         CancellationToken cancellationToken)
@@ -143,7 +146,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpPost]
-   // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("update-agenda")]
     public async Task<IActionResult> UpdateAgendaToEvent(UpdateAgendaRequest request,
         CancellationToken cancellationToken)
@@ -152,7 +155,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpGet("{eventId:int}/registrations/grouped")]
-   // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType(typeof(EventRegistrationsGroupedDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<EventRegistrationsGroupedDto>> GetRegistrationsGrouped(
     [FromRoute] int eventId,
@@ -163,7 +166,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpPost("{eventId:int}/registrations/{userId:int}/confirm")]
-  //  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // optionally restrict to admins
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // optionally restrict to admins
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> ConfirmWaitlisted(
     [FromRoute] int eventId,
@@ -181,8 +184,7 @@ public class EventsController(IEventService eventService) : ControllerBase
         }
     }
 
-    [HttpPost("{eventId:int}/waitlist/{userId:int}/reject")]
-  //  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // e.g. policy/role later
+    [HttpPost("{eventId:int}/waitlist/{userId:int}/reject")] [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // e.g. policy/role later
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> RejectWaitlisted(
     [FromRoute] int eventId,
@@ -202,6 +204,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     
     
     [HttpDelete]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("delete-event")]
     public async Task<IActionResult> DeleteEventAsync(int eventId, CancellationToken cancellationToken)
     {
@@ -210,6 +213,7 @@ public class EventsController(IEventService eventService) : ControllerBase
     }
 
     [HttpGet("export")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> ExportEventsAsCsv(
     [FromQuery] EventsSearchRequestDto query,
     CancellationToken ct)

@@ -1,6 +1,8 @@
 ﻿using Application.DTOs;
 using Application.Services.Abstractions;
 using Mapster;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.DTOs.ResponseModels;
 
@@ -8,6 +10,7 @@ namespace Presentation.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class AnalyticsController : ControllerBase
 {
     private readonly IAnalyticsService analyticsService;
