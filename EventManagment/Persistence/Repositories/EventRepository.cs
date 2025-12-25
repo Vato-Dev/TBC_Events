@@ -13,6 +13,13 @@ namespace Persistence.Repositories;
 
 public class EventRepository(AppDbContext context)  : IEventRepository
 {
+    public Task<bool> IsEventOwnerAsync(int userId, int eventId, CancellationToken ct)
+    {
+        return context.Events
+            .AsNoTracking()
+            .AnyAsync(e => e.Id == eventId && e.CreatedById == userId, ct);
+    }
+
     public async Task ConfirmWaitlistedAsync(int eventId, int userId, CancellationToken ct)
     {
         var waitlistedStatusId = await context.RegistrationStatuses

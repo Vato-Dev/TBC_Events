@@ -22,6 +22,8 @@ public interface IEventService
     Task DeleteEventAsync(int eventId, CancellationToken cancellationToken);
     Task<Event> GetEventByIdAsyncc(int eventId, CancellationToken cancellationToken);
     Task<byte[]> GetEventsAsCsvAsync(int customerId, EventsSearchFilters filters, CancellationToken ct = default);
+    Task<bool> IsEventOwnerAsync(int userId, int eventId, CancellationToken ct = default);
+
 
 
 }
