@@ -7,6 +7,7 @@ using Application.Requests.Events;
 using Application.Services.Abstractions;
 using Domain.Models;
 using Mapster;
+using System.Text;
 
 namespace Application.Services.Implementations;
 
@@ -27,6 +28,32 @@ public class EventService(IEventRepository repository , ICurrentUserService curr
 
     public Task<EventsSearchResult> GetEventsAsync(int customerId, EventsSearchFilters filters, CancellationToken ct = default)
         => repository.GetAllAsync(customerId, filters, ct);
+
+    public async Task<byte[]> GetEventsAsCsvAsync(int customerId, EventsSearchFilters filters, CancellationToken ct = default)
+    {
+        var result = await repository.GetAllAsync(customerId, filters, ct);
+        var sb = new StringBuilder();
+
+        // CSV header (NO MyStatus)
+        sb.AppendLine(
+            "Title,StartDateTime,EndDateTime,Location,Capacity,RegisteredUsers,Description"
+        );
+
+        foreach (var ev in result.Items)
+        {
+            sb.AppendLine(
+                $"\"{ev.Title}\"," +
+                $"{ev.StartsAt:O}," +
+                $"{ev.EndsAt:O}," +
+                $"\"{ev.Location}\"," +
+                $"{ev.Capacity}," +
+                $"{ev.TotalRegistered}," +
+                $"{ev.Description}"
+            );
+        }
+
+        return Encoding.UTF8.GetBytes(sb.ToString());
+    }
 
     public Task<CategoriesResult> GetCategoriesAsync(int customerId, bool withCounts, CancellationToken ct = default)
         => repository.GetCategoriesAsync(customerId, withCounts, ct);

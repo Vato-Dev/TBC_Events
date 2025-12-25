@@ -216,4 +216,18 @@ public class EventsController(IEventService eventService) : ControllerBase
         await eventService.DeleteEventAsync(eventId, cancellationToken);
         return NoContent();
     }
+
+    [HttpGet("export")]
+    public async Task<IActionResult> ExportEventsAsCsv(
+    [FromQuery] EventsSearchRequestDto query,
+    CancellationToken ct)
+    {
+        var userId = 1;
+        var filters = query.Adapt<EventsSearchFilters>();
+
+        var csv = await eventService.GetEventsAsCsvAsync(userId, filters, ct);
+
+        return File(csv, "text/csv", "events.csv");
+    }
+
 }
