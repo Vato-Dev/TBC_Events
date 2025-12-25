@@ -16,6 +16,15 @@ public class TagConfiguration : IEntityTypeConfiguration<TagEntity>
 
         builder.Property(e => e.Category).HasMaxLength(50);
         builder.Property(e => e.Name).HasMaxLength(50);
-        
+
+        builder.HasData(
+            new TagEntity { Id = 1, Name = "outdoor", Category = "theme" },
+            new TagEntity { Id = 2, Name = "team-building", Category = "theme" },
+            new TagEntity { Id = 3, Name = "free-food", Category = "perk" },
+            new TagEntity { Id = 4, Name = "networking", Category = "theme" },
+            new TagEntity { Id = 5, Name = "tech", Category = "topic" },
+            new TagEntity { Id = 6, Name = "wellness", Category = "topic" }
+        );
+
     }
 }

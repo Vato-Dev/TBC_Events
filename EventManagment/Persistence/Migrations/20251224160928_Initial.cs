@@ -237,8 +237,17 @@ namespace Persistence.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StartDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    RegistrationStart = table.Column<DateOnly>(type: "date", nullable: false),
+                    RegistrationEnd = table.Column<DateOnly>(type: "date", nullable: false),
+                    Location_LocationType = table.Column<int>(type: "int", nullable: false),
+                    Location_Address_VenueName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Location_Address_Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location_Address_City = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Location_RoomNumber = table.Column<int>(type: "int", nullable: false),
+                    Location_FloorNumber = table.Column<int>(type: "int", nullable: false),
+                    Location_AdditionalInformation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Capacity = table.Column<int>(type: "int", nullable: false),
+                    RegisteredUsers = table.Column<int>(type: "int", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(getutcdate())"),
@@ -259,6 +268,31 @@ namespace Persistence.Migrations
                         column: x => x.EventTypeId,
                         principalTable: "EventTypes",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AgendaItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    Duration = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AgendaItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AgendaItems_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -317,6 +351,28 @@ namespace Persistence.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "AgendaTracks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AgendaItemId = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Speaker = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Room = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AgendaTracks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AgendaTracks_AgendaItems_AgendaItemId",
+                        column: x => x.AgendaItemId,
+                        principalTable: "AgendaItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
@@ -326,6 +382,165 @@ namespace Persistence.Migrations
                     { 2, null, "Organizer", "ORGANIZER" },
                     { 3, null, "Admin", "ADMIN" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LastOtpSentTime", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { 1, 0, "ca1b8751-a920-4346-b1fc-34c0a43b36fd", "admin@demo.com", true, null, false, null, "ADMIN@DEMO.COM", "ADMIN@DEMO.COM", "AQAAAAIAAYagAAAAEPAoOBXFAn6c/q5LNwvIeObvFe7Qnk56q4k2K73g6ZfJPV7LdMFKCgfAnO8KTxA13w==", null, false, "f3dea322-032b-456f-a541-2630b7ce883c", false, "admin@demo.com" },
+                    { 2, 0, "a54a29cc-1b48-4f9a-b5ef-b7373f5c86b5", "organizer@demo.com", true, null, false, null, "ORGANIZER@DEMO.COM", "ORGANIZER@DEMO.COM", "AQAAAAIAAYagAAAAEOd6LV5gAIWE3useD9A9VK3UXSOwX5A9+AvSUP/a1dKh6eEol8/8o8E+FsKWyPOvew==", null, false, "d747028d-c837-4f34-a9a4-408b2dfdfb59", false, "organizer@demo.com" },
+                    { 3, 0, "cbdb0696-2bc5-44a4-be07-b31f21a520e8", "employee1@demo.com", true, null, false, null, "EMPLOYEE1@DEMO.COM", "EMPLOYEE1@DEMO.COM", "AQAAAAIAAYagAAAAEK2phzUSMlW4iHsMAmFCSwdhC6acpVKXr+iuIaSoaPS3+Hq8lmoypnETYib678TCXQ==", null, false, "fd550ba5-e278-4dfe-b98e-c2ede820e53a", false, "employee1@demo.com" },
+                    { 4, 0, "06271632-a0d6-4556-ae9b-aa73622cbccb", "employee2@demo.com", true, null, false, null, "EMPLOYEE2@DEMO.COM", "EMPLOYEE2@DEMO.COM", "AQAAAAIAAYagAAAAEPlfjl2K3m/cXyAyi/2ECR39LdGeU1PHySoVCE3KceA+G/uP73Qq1+lLa8FBi+cLsQ==", null, false, "63372ba7-eaaa-450b-8f66-08ced363236a", false, "employee2@demo.com" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "EventTypes",
+                columns: new[] { "Id", "Description", "IsActive", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Hands-on session", true, "Workshop" },
+                    { 2, "Community meetup", true, "Meetup" },
+                    { 3, "Large multi-session event", true, "Conference" },
+                    { 4, "Online session", true, "Webinar" },
+                    { 5, "Internal team activity", true, "Team Building" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "RegistrationStatuses",
+                columns: new[] { "Id", "Description", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Awaiting approval", "Pending" },
+                    { 2, "No spots currently available", "Waitlisted" },
+                    { 3, "Registration cancelled", "Cancelled" },
+                    { 4, "Spot confirmed", "Confirmed" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Tags",
+                columns: new[] { "Id", "Category", "Name" },
+                values: new object[,]
+                {
+                    { 1, "theme", "outdoor" },
+                    { 2, "theme", "team-building" },
+                    { 3, "perk", "free-food" },
+                    { 4, "theme", "networking" },
+                    { 5, "topic", "tech" },
+                    { 6, "topic", "wellness" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { 3, 1 },
+                    { 2, 2 },
+                    { 1, 3 },
+                    { 1, 4 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "DomainUsers",
+                columns: new[] { "Id", "CreatedAt", "Department", "Email", "FullName", "IsActive", "Role" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc), 2, "admin@demo.com", "Demo Admin", true, 3 },
+                    { 2, new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc), 4, "organizer@demo.com", "Demo Organizer", true, 2 },
+                    { 3, new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc), 6, "employee1@demo.com", "Demo Employee 1", true, 1 },
+                    { 4, new DateTime(2025, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc), 1, "employee2@demo.com", "Demo Employee 2", true, 1 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Events",
+                columns: new[] { "Id", "Location_Address_City", "Location_Address_Street", "Location_Address_VenueName", "Capacity", "CreatedAt", "CreatedById", "Description", "EndDateTime", "EventTypeId", "ImageUrl", "IsActive", "RegisteredUsers", "RegistrationEnd", "RegistrationStart", "StartDateTime", "Title", "UpdatedAt", "Location_AdditionalInformation", "Location_FloorNumber", "Location_LocationType", "Location_RoomNumber" },
+                values: new object[,]
+                {
+                    { 1, "Tbilisi", "Gerdasd", "Building", 10, new DateTime(2025, 8, 1, 9, 0, 0, 0, DateTimeKind.Utc), 2, "Introductory workshop (past event)", new DateTime(2025, 9, 10, 12, 0, 0, 0, DateTimeKind.Utc), 1, null, true, 1, new DateOnly(2025, 9, 9), new DateOnly(2025, 8, 20), new DateTime(2025, 9, 10, 10, 0, 0, 0, DateTimeKind.Utc), "Past Workshop: EF Core Basics", new DateTime(2025, 9, 1, 9, 0, 0, 0, DateTimeKind.Utc), "Sigma", 5, 0, 4 },
+                    { 2, "Tbilisi", "Rustaveli Ave", "Tech Hub", 60, new DateTime(2025, 12, 10, 10, 0, 0, 0, DateTimeKind.Utc), 2, "Community meetup and short talks", new DateTime(2026, 1, 15, 19, 0, 0, 0, DateTimeKind.Utc), 1, "https://pics.example.com/events/graphql.png", true, 1, new DateOnly(2026, 1, 14), new DateOnly(2025, 12, 20), new DateTime(2026, 1, 15, 17, 0, 0, 0, DateTimeKind.Utc), "GraphQL Meetup: APIs in Practice", new DateTime(2025, 12, 10, 10, 0, 0, 0, DateTimeKind.Utc), "Snacks provided", 2, 0, 12 },
+                    { 3, "Remote", "N/A", "Online", 200, new DateTime(2026, 1, 5, 11, 0, 0, 0, DateTimeKind.Utc), 2, "Live Q&A + examples", new DateTime(2026, 2, 5, 17, 30, 0, 0, DateTimeKind.Utc), 1, null, true, 0, new DateOnly(2026, 2, 4), new DateOnly(2026, 1, 10), new DateTime(2026, 2, 5, 16, 0, 0, 0, DateTimeKind.Utc), "Virtual: Clean Architecture Q&A", new DateTime(2026, 1, 5, 11, 0, 0, 0, DateTimeKind.Utc), "Join link in email", 0, 1, 0 },
+                    { 4, "Tbilisi", "Chavchavadze", "Conference Center", 40, new DateTime(2026, 2, 1, 9, 0, 0, 0, DateTimeKind.Utc), 2, "Hands-on + streaming", new DateTime(2026, 3, 12, 12, 0, 0, 0, DateTimeKind.Utc), 1, null, true, 1, new DateOnly(2026, 3, 11), new DateOnly(2026, 2, 10), new DateTime(2026, 3, 12, 9, 0, 0, 0, DateTimeKind.Utc), "Hybrid: Docker for .NET Developers", new DateTime(2026, 2, 1, 9, 0, 0, 0, DateTimeKind.Utc), "Streaming available", 1, 2, 7 },
+                    { 5, "Tbilisi", "Kazbegi Ave", "DB Lab", 25, new DateTime(2025, 9, 15, 12, 0, 0, 0, DateTimeKind.Utc), 2, "Indexing and query tuning", new DateTime(2025, 10, 22, 15, 0, 0, 0, DateTimeKind.Utc), 1, null, true, 0, new DateOnly(2025, 10, 21), new DateOnly(2025, 10, 1), new DateTime(2025, 10, 22, 13, 0, 0, 0, DateTimeKind.Utc), "Past: SQL Performance Clinic", new DateTime(2025, 10, 1, 12, 0, 0, 0, DateTimeKind.Utc), "Bring laptop", 4, 0, 3 },
+                    { 6, "Remote", "N/A", "Online", 300, new DateTime(2026, 3, 1, 10, 0, 0, 0, DateTimeKind.Utc), 2, "xUnit + Moq + patterns", new DateTime(2026, 4, 8, 18, 0, 0, 0, DateTimeKind.Utc), 1, "https://pics.example.com/events/testing.png", true, 1, new DateOnly(2026, 4, 7), new DateOnly(2026, 3, 10), new DateTime(2026, 4, 8, 15, 0, 0, 0, DateTimeKind.Utc), "Virtual: Unit Testing Masterclass", new DateTime(2026, 3, 1, 10, 0, 0, 0, DateTimeKind.Utc), "Recording will be shared", 0, 1, 0 },
+                    { 7, "Tbilisi", "Tamarashvili", "Community Space", 80, new DateTime(2026, 4, 1, 8, 0, 0, 0, DateTimeKind.Utc), 2, "Bring a project, ship something", new DateTime(2026, 5, 20, 21, 0, 0, 0, DateTimeKind.Utc), 1, null, true, 0, new DateOnly(2026, 5, 19), new DateOnly(2026, 4, 20), new DateTime(2026, 5, 20, 18, 0, 0, 0, DateTimeKind.Utc), "In-Person: Hack Night", new DateTime(2026, 4, 1, 8, 0, 0, 0, DateTimeKind.Utc), "Open seating", 6, 0, 21 },
+                    { 8, "Tbilisi", "Pekini Ave", "Cloud Lab", 50, new DateTime(2026, 5, 1, 9, 0, 0, 0, DateTimeKind.Utc), 2, "CI/CD + deploy walkthrough", new DateTime(2026, 6, 11, 14, 0, 0, 0, DateTimeKind.Utc), 1, "https://pics.example.com/events/cloud.png", true, 0, new DateOnly(2026, 6, 10), new DateOnly(2026, 5, 10), new DateTime(2026, 6, 11, 10, 0, 0, 0, DateTimeKind.Utc), "Hybrid: Cloud Deployment Workshop", new DateTime(2026, 5, 1, 9, 0, 0, 0, DateTimeKind.Utc), "Workshop materials included", 3, 2, 9 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AgendaItems",
+                columns: new[] { "Id", "Description", "Duration", "EventId", "Location", "StartTime", "Title", "Type" },
+                values: new object[,]
+                {
+                    { 101, "Pick up materials and settle in.", new TimeSpan(0, 0, 15, 0, 0), 1, "Lobby", new TimeOnly(10, 0, 0), "Registration & Coffee", 5 },
+                    { 102, "DbContext, tracking, and basic mappings.", new TimeSpan(0, 0, 45, 0, 0), 1, "Room 4", new TimeOnly(10, 15, 0), "EF Core Fundamentals", 1 },
+                    { 103, "Build a small model + migrations + queries.", new TimeSpan(0, 0, 50, 0, 0), 1, "Room 4", new TimeOnly(11, 5, 0), "Hands-on Lab", 2 },
+                    { 201, "Snacks + meet the community.", new TimeSpan(0, 0, 20, 0, 0), 2, "Main Hall", new TimeOnly(17, 0, 0), "Welcome & Networking", 5 },
+                    { 202, "Short talks from multiple speakers.", new TimeSpan(0, 0, 40, 0, 0), 2, "Main Hall", new TimeOnly(17, 20, 0), "Talks: GraphQL in Production", 6 },
+                    { 203, "Bring your questions.", new TimeSpan(0, 0, 40, 0, 0), 2, "Main Hall", new TimeOnly(18, 10, 0), "Open Q&A", 6 },
+                    { 301, "Live Q&A + examples.", new TimeSpan(0, 1, 0, 0, 0), 3, "Online", new TimeOnly(16, 0, 0), "Clean Architecture Q&A", 6 },
+                    { 302, "Links and next steps.", new TimeSpan(0, 0, 30, 0, 0), 3, "Online", new TimeOnly(17, 0, 0), "Wrap-up & Resources", 7 },
+                    { 401, "Verify Docker desktop + repo clone.", new TimeSpan(0, 0, 30, 0, 0), 4, "Room 7 / Stream", new TimeOnly(9, 0, 0), "Intro + Setup", 1 },
+                    { 402, "Containers, compose, debugging.", new TimeSpan(0, 2, 0, 0, 0), 4, "Room 7 / Stream", new TimeOnly(9, 30, 0), "Hands-on Workshop", 2 },
+                    { 501, "Read plans, fix slow queries.", new TimeSpan(0, 1, 0, 0, 0), 5, "Room 3", new TimeOnly(13, 0, 0), "Query Tuning Clinic", 2 },
+                    { 502, "Index strategy and pitfalls.", new TimeSpan(0, 1, 0, 0, 0), 5, "Room 3", new TimeOnly(14, 0, 0), "Indexing Deep Dive", 1 },
+                    { 601, "xUnit, Moq, and common patterns.", new TimeSpan(0, 1, 30, 0, 0), 6, "Online", new TimeOnly(15, 0, 0), "Unit Testing Patterns", 2 },
+                    { 602, "Refactor tests + coverage improvements.", new TimeSpan(0, 1, 30, 0, 0), 6, "Online", new TimeOnly(16, 30, 0), "Hands-on Lab", 2 },
+                    { 701, "Pitch ideas and form groups.", new TimeSpan(0, 0, 30, 0, 0), 7, "Community Space", new TimeOnly(18, 0, 0), "Kickoff & Team Forming", 5 },
+                    { 702, "Ship something small.", new TimeSpan(0, 2, 30, 0, 0), 7, "Community Space", new TimeOnly(18, 30, 0), "Build Session", 5 },
+                    { 801, "Pipeline basics and environments.", new TimeSpan(0, 0, 45, 0, 0), 8, "Cloud Lab / Stream", new TimeOnly(10, 0, 0), "CI/CD Overview", 1 },
+                    { 802, "Deploy end-to-end.", new TimeSpan(0, 3, 15, 0, 0), 8, "Cloud Lab / Stream", new TimeOnly(10, 45, 0), "Deploy Walkthrough", 2 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "EventTags",
+                columns: new[] { "Id", "EventId", "TagId" },
+                values: new object[,]
+                {
+                    { 1, 1, 5 },
+                    { 2, 2, 3 },
+                    { 3, 2, 4 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Registrations",
+                columns: new[] { "Id", "CancelledAt", "EventId", "RegisteredAt", "StatusId", "UserId" },
+                values: new object[,]
+                {
+                    { 1, null, 1, new DateTime(2025, 9, 1, 10, 0, 0, 0, DateTimeKind.Utc), 4, 3 },
+                    { 2, null, 2, new DateTime(2025, 11, 20, 10, 0, 0, 0, DateTimeKind.Utc), 4, 4 },
+                    { 3, null, 4, new DateTime(2025, 11, 10, 10, 0, 0, 0, DateTimeKind.Utc), 4, 3 },
+                    { 4, null, 6, new DateTime(2025, 12, 10, 10, 0, 0, 0, DateTimeKind.Utc), 4, 4 },
+                    { 5, null, 2, new DateTime(2025, 11, 21, 10, 0, 0, 0, DateTimeKind.Utc), 2, 3 },
+                    { 6, new DateTime(2025, 8, 28, 10, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(2025, 8, 25, 10, 0, 0, 0, DateTimeKind.Utc), 3, 4 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AgendaTracks",
+                columns: new[] { "Id", "AgendaItemId", "Room", "Speaker", "Title" },
+                values: new object[,]
+                {
+                    { 1001, 103, "Room 4", "Beka Ghvaberidze", "Track A: Migrations" },
+                    { 1002, 103, "Room 4", "Giorgi Tamarashvili", "Track B: LINQ Queries" },
+                    { 2001, 202, "Main Hall", "Lasha Daushvili", "GraphQL Schema Design" },
+                    { 2002, 202, "Main Hall", "Dimitri Dondoladze", "Caching & Performance" },
+                    { 4001, 402, "Room 7 / Stream", "James Richardson", "Docker Compose & Environment Variables" },
+                    { 4002, 402, "Room 7 / Stream", "Elena Novak", "Debugging Containers in .NET" },
+                    { 6001, 601, "Online", "Lasha Daushvili", "Mocks vs Fakes" },
+                    { 6002, 602, "Online", "Beka Ghvaberidze", "Refactoring Legacy Tests" },
+                    { 8001, 802, "Cloud Lab / Stream", "Andrei Popescu", "CI/CD Pipeline Setup" },
+                    { 8002, 802, "Cloud Lab / Stream", "Natalie Wong", "Deployment & Rollback Strategies" }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AgendaItems_EventId_StartTime",
+                table: "AgendaItems",
+                columns: new[] { "EventId", "StartTime" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AgendaTracks_AgendaItemId",
+                table: "AgendaTracks",
+                column: "AgendaItemId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -389,6 +604,11 @@ namespace Persistence.Migrations
                 columns: new[] { "EventTypeId", "StartDateTime", "IsActive" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Events_Location_Address_VenueName_Location_Address_City",
+                table: "Events",
+                columns: new[] { "Location_Address_VenueName", "Location_Address_City" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_StartDateTime_Active",
                 table: "Events",
                 column: "StartDateTime",
@@ -450,6 +670,9 @@ namespace Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AgendaTracks");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -471,16 +694,19 @@ namespace Persistence.Migrations
                 name: "Registrations");
 
             migrationBuilder.DropTable(
+                name: "AgendaItems");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Tags");
 
             migrationBuilder.DropTable(
-                name: "Events");
+                name: "RegistrationStatuses");
 
             migrationBuilder.DropTable(
-                name: "RegistrationStatuses");
+                name: "Events");
 
             migrationBuilder.DropTable(
                 name: "DomainUsers");

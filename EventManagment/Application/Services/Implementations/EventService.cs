@@ -1,6 +1,7 @@
-
+﻿
 
 using Application.Exceptions;
+using Application.DTOs;
 using Application.Repositories;
 using Application.Requests.Events;
 using Application.Services.Abstractions;
@@ -20,7 +21,25 @@ public class EventService(IEventRepository repository , ICurrentUserService curr
       newEvent.CreatedById = currentUser.UserId;
      return repository.CreateEventAsync(newEvent,request.TagIds,cancellationToken); //to aptimize it
     }
-    public async Task<int> CreateAndAddAgendaToEvent(int eventId,CreateAgendaRequest request, CancellationToken cancellationToken)
+
+    public Task<EventFiltersMeta> GetFiltersMetaAsync(int customerId, CancellationToken ct)
+        => repository.GetFiltersMetaAsync(customerId, ct);
+
+    public Task<EventsSearchResult> GetEventsAsync(int customerId, EventsSearchFilters filters, CancellationToken ct = default)
+        => repository.GetAllAsync(customerId, filters, ct);
+
+    public Task<CategoriesResult> GetCategoriesAsync(int customerId, bool withCounts, CancellationToken ct = default)
+        => repository.GetCategoriesAsync(customerId, withCounts, ct);
+
+    public Task<EventDetails?> GetEventDetailsAsync(int customerId, int eventId, CancellationToken ct) 
+        => repository.GetEventDetailsAsync(customerId, eventId, ct);
+    public Task RegisterOnEventAsync(int customerId, int eventId, CancellationToken ct = default)
+    => repository.RegisterOnEventAsync(customerId, eventId, ct);
+
+    public Task UnregisterFromEventAsync(int customerId, int eventId, CancellationToken ct = default)
+        => repository.UnregisterFromEventAsync(customerId, eventId, ct);
+
+    public async Task CreateAndAddAgendaToEvent(int eventId, CreateAgendaRequest request, CancellationToken ct)
     {
         var @event = await repository.GetEventByIdAsync(eventId, cancellationToken);
         if (@event == null) throw new NotFoundException();
@@ -65,3 +84,35 @@ public class EventService(IEventRepository repository , ICurrentUserService curr
 
 
 
+public sealed record CreateAgendaRequest
+{
+    public TimeOnly StartTime { get; set; }
+    public TimeSpan Duration { get; set; }
+    public string Title { get; set; } = null!;
+    public string? Description { get; set; }
+    public AgendaItemType Type { get; set; }
+    public string? Location { get; set; }
+    public List<AgendaTrackRequest>? AgendaTracks { get; init; } = new();
+}
+
+public sealed record AgendaTrackRequest
+{
+    public string Title { get; set; } = null!;
+    public string? Speaker { get; set; }
+    public string? Room { get; set; }
+}
+
+public sealed record CreateEventRequest
+{
+    public string Title { get; init; } = null!;
+    public string? Description { get; init; }
+    public DateTime StartDateTime { get; init; }
+    public DateTime EndDateTime { get; init; }
+    public DateOnly RegistrationStart { get; init; }
+    public DateOnly RegistrationEnd { get; init; }
+    public Location Location { get; init; } = null!;
+    public int Capacity { get; init; }
+    public string? ImageUrl { get; init; }
+    public List<int> TagIds { get; init; } = new();
+    public int EventTypeId { get; init; }
+}

@@ -2,6 +2,8 @@
 using Application.Services.Implementations;
 using Domain.Models;
 
+using Application.DTOs;
+
 namespace Application.Services.Abstractions;
 
 public interface IEventService
@@ -12,4 +14,10 @@ public interface IEventService
     Task<int> UpdateAgendaItemAsync(UpdateAgendaRequest request, CancellationToken cancellationToken);
     Task DeleteEventAsync(int eventId, CancellationToken cancellationToken);
     Task<Event> GetEventByIdAsyncc(int eventId, CancellationToken cancellationToken);
+    Task<EventFiltersMeta> GetFiltersMetaAsync(int customerId, CancellationToken ct = default);
+    Task<EventsSearchResult> GetEventsAsync(int customerId, EventsSearchFilters filters, CancellationToken ct = default);
+    Task<CategoriesResult> GetCategoriesAsync(int userId, bool withCounts, CancellationToken ct);
+    Task<EventDetails?> GetEventDetailsAsync(int customerId, int eventId, CancellationToken ct);
+    Task RegisterOnEventAsync(int customerId, int eventId, CancellationToken ct = default);
+    Task UnregisterFromEventAsync(int customerId, int eventId, CancellationToken ct = default);
 }
