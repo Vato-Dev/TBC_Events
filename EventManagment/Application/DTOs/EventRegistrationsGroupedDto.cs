@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +25,7 @@ namespace Application.DTOs
         public int Id { get; init; }
         public string Email { get; init; } = null!;
         public string FullName { get; init; } = null!;
-        public string? Department { get; init; }
+        public Department? Department { get; init; }
         public MyStatus Status { get; init; } = MyStatus.NOT_REGISTERED;
         public DateTime CreatedAt { get; init; }
     }

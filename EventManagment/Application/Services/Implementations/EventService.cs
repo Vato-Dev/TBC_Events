@@ -80,5 +80,16 @@ public class EventService(IEventRepository repository , ICurrentUserService curr
         if(@event is null) throw new NotFoundException();
         return @event;
     }
+
+    public async Task<EventRegistrationsGroupedDto> GetEventRegistrationsGroupedAsync(int eventId, CancellationToken ct = default)
+    {
+        return await repository.GetEventRegistrationsGroupedAsync(eventId, ct);
+    }
+    public Task ConfirmWaitlistedAsync(int eventId, int userId, CancellationToken ct = default)
+        => repository.ConfirmWaitlistedAsync(eventId, userId, ct);
+
+    public Task RejectWaitlistedAsync(int eventId, int userId, CancellationToken ct = default)
+        => repository.RejectWaitlistedAsync(eventId, userId, ct);
+
 }
 

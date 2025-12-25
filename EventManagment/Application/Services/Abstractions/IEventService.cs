@@ -16,6 +16,10 @@ public interface IEventService
     Task<EventDetails?> GetEventDetailsAsync(int customerId, int eventId, CancellationToken ct);
     Task RegisterOnEventAsync(int customerId, int eventId, CancellationToken ct = default);
     Task UnregisterFromEventAsync(int customerId, int eventId, CancellationToken ct = default);
+    Task<EventRegistrationsGroupedDto> GetEventRegistrationsGroupedAsync(int eventId, CancellationToken ct = default);
+    Task ConfirmWaitlistedAsync(int eventId, int userId, CancellationToken ct = default);
+    Task RejectWaitlistedAsync(int eventId, int userId, CancellationToken ct = default);
+
     Task DeleteEventAsync(int eventId, CancellationToken cancellationToken);
     Task<Event> GetEventByIdAsyncc(int eventId, CancellationToken cancellationToken);
 
