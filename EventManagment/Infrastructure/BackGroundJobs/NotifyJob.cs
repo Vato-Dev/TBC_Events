@@ -8,6 +8,7 @@ using Quartz;
 
 namespace Infrastructure.BackGroundJobs;
 
+[DisallowConcurrentExecution]//Some guy from C# community suggested
 public class NotifyJob(AppDbContext repository,IEmailSender emailSender) : IJob
 {
     public static readonly JobKey Key = new JobKey("Notify_Events_Bgining");
