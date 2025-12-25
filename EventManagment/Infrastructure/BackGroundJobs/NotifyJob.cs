@@ -1,7 +1,9 @@
+using Application.DTOs;
 using Application.Services.Abstractions;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
+using Persistence.Entities;
 using Quartz;
 
 namespace Infrastructure.BackGroundJobs;
@@ -9,35 +11,53 @@ namespace Infrastructure.BackGroundJobs;
 public class NotifyJob(AppDbContext repository,IEmailSender emailSender) : IJob
 {
     public static readonly JobKey Key = new JobKey("Notify_Events_Bgining");
+    public const string ConfirmedStatus =  "Confirmed";
+    public const string WailingStatus =  "Waitlisted";
     public async Task Execute(IJobExecutionContext context)
     {
-        var filter = NotificationSettings.OneHourBeforeReminder | NotificationSettings.TwentyForHourBeforeReminder;
-        var eventsToSendMessages = await repository.Events.Where(x => (x.NotificationSettings & filter) != 0)
+        var now = DateTime.Now;
+        var upcomingEvents = await repository.Events
+            .Where(e => e.StartDateTime > now && e.StartDateTime <= now.AddHours(24))
+            .Where(e => (e.NotificationSettings & (NotificationSettings.OneHourBeforeReminder | NotificationSettings.TwentyForHourBeforeReminder)) != 0)
+            .Include(e => e.Registrations)
+            .ThenInclude(r => r.UserEntity) 
+            .Include(e => e.Registrations)
+            .ThenInclude(r => r.StatusEntity)
             .ToListAsync(context.CancellationToken);
-
-        var groups = eventsToSendMessages
-            .GroupBy(x => x.NotificationSettings)
-            .ToDictionary(g => g.Key, g => g.ToList());
         
-        var GetActiveRegistrations = repository.Registrations.Include(x=>x.StatusEntity).Where(x=>x.)
-
-        foreach (var group in groups)
+        foreach (var ev in upcomingEvents)
         {
-            var notifications = group.Value;
-            switch (group.Key)
+            TimeSpan timeToStart = ev.StartDateTime - now;
+
+            if (ev.NotificationSettings.HasFlag(NotificationSettings.TwentyForHourBeforeReminder))
             {
-                
-                case NotificationSettings.OneHourBeforeReminder:
-                    var sortedListOfEvents24 = notifications.Where(x=> DateTime.UtcNow - x.StartDateTime < TimeSpan.FromHours(1)).ToList();
-                    var message = $"Hello dear, We are happy to let you know that "
-                    break;
-                case NotificationSettings.TwentyForHourBeforeReminder:
-                    var sortedListOfEvents1 = notifications.Where(x=> DateTime.UtcNow - x.StartDateTime < TimeSpan.FromHours(24)).ToList();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                if (timeToStart <= TimeSpan.FromHours(24) && timeToStart > TimeSpan.FromHours(23))
+                {
+                    await SendNotifications(ev, "Reminder: Event starts in 24 hours!");
+                }
+            }
+
+            if (ev.NotificationSettings.HasFlag(NotificationSettings.OneHourBeforeReminder))
+            {
+                if (timeToStart <= TimeSpan.FromHours(1) && timeToStart > TimeSpan.FromMinutes(0))
+                {
+                    await SendNotifications(ev, "Reminder: Event starts in 1 hour!");
+                }
             }
         }
-        return Task.CompletedTask;
+    }
+
+    private async Task SendNotifications(EventEntity ev, string subject)
+    {
+        var recipients = ev.Registrations
+            .Where(r => r.StatusEntity.Name.Equals("Confirmed", StringComparison.OrdinalIgnoreCase))
+            .Select(r => r.UserEntity.Email)
+            .ToList();
+
+        foreach (var email in recipients)
+        {
+            await emailSender.SendEmailAsync(new EmailData
+                { EmailToName = email, EmailSubject = subject, Message = $"Event {ev.Title} is starting soon!"});
+        }
     }
 }
