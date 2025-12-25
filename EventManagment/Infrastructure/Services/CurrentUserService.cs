@@ -8,6 +8,7 @@ public sealed class CurrentUserService : ICurrentUserService
 {
     public int UserId { get; }
     public bool IsAuthenticated { get; }
+    public string? UserName { get; }
     public IReadOnlyCollection<string> Roles { get; }
 
     public CurrentUserService(IHttpContextAccessor accessor)
@@ -32,6 +33,7 @@ public sealed class CurrentUserService : ICurrentUserService
         UserId = int.Parse(
             user!.FindFirstValue("Sid")!
         );
+        UserName = user!.FindFirstValue("Preferred_name");
 
         Roles = user!.FindAll("Role")
             .Select(c => c.Value)
