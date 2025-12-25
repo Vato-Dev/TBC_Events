@@ -30,7 +30,7 @@ public class TokenService(IOptions<JwtServiceOptions> options)
             audience: options.Value.Audience,
             claims,
             notBefore: DateTime.UtcNow,
-            expires: DateTime.UtcNow.AddMinutes(4),
+            expires: DateTime.UtcNow.AddMinutes(30),
             signInCredentials);
         
         return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);

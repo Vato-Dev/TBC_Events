@@ -6,11 +6,13 @@ using Application.Extensions;
 using Infrastructure.BackGroundJobs;
 using Infrastructure.Mappings;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
 using Persistence.Mappings;
 using Presentation;
 using Presentation.Extensions;
+using Presentation.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDistributedMemoryCache();
@@ -27,11 +29,11 @@ IdentityErrorToApplicationMappings.ConfigureMappings();
 RequestsToDomain.ConfigureMappings();
 
 
-/*builder.Services.AddStackExchangeRedisCache(options =>
+builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = "localhost:6379"; //mt ADRESS IF I ONLY COULS FIX MY DOCKER CONTAINER BRUH
-    options.InstanceName = "Otp_"; //PREFIX
-});*/
+    options.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "redis:6379";
+    options.InstanceName = "Otp_";
+});
 builder.Services.AddApplicationServices();
 builder.Services.AddJwtBearerAuthentication(builder.Configuration);
 builder.Services.AddControllers();
@@ -73,6 +75,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors(corsPolicyBuilder => corsPolicyBuilder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseMiddleware<GlobalErrorHandlingMiddleWare>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
