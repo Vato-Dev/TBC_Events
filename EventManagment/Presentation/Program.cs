@@ -27,11 +27,11 @@ IdentityErrorToApplicationMappings.ConfigureMappings();
 RequestsToDomain.ConfigureMappings();
 
 
-/*builder.Services.AddStackExchangeRedisCache(options =>
+builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = "localhost:6379"; //mt ADRESS IF I ONLY COULS FIX MY DOCKER CONTAINER BRUH
-    options.InstanceName = "Otp_"; //PREFIX
-});*/
+    options.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "redis:6379";
+    options.InstanceName = "Otp_";
+});
 builder.Services.AddApplicationServices();
 builder.Services.AddJwtBearerAuthentication(builder.Configuration);
 builder.Services.AddControllers();

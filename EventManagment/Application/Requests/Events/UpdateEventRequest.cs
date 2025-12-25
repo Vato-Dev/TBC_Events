@@ -11,6 +11,7 @@ public sealed record UpdateEventRequest
     public DateTime EndDateTime { get; init; }
     public DateOnly RegistrationStart { get; init; }
     public DateOnly RegistrationEnd { get; init; }
+    public NotificationSettings NotificationSettings { get; init; }
     public Location Location { get; init; } = null!;
     public int Capacity { get; init; } 
     public string? ImageUrl { get; init; }

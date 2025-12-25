@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddEmailWithOtpService(this IServiceCollection services)
     {
      //   services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<ISmsSender, SmsSender>(); // ar sheicvala performance singleton rom gavxade daje piriqiT (wesit egac da email sender unda iyos singleton)
         services.AddScoped<IEmailSender, EmailSender>();
         services.AddScoped<IUserService, UserService>();

@@ -2,6 +2,7 @@ using System.Xml;
 using Application.DTOs;
 using Application.Repositories;
 using Application.Requests.Events;
+using Application.Services.Abstractions;
 using Application.Services.Implementations;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
@@ -11,7 +12,7 @@ using Persistence.Entities;
 using Persistence.Mappings;
 namespace Persistence.Repositories;
 
-public class EventRepository(AppDbContext context)  : IEventRepository
+public class EventRepository(AppDbContext context, IEmailSender emailSender)  : IEventRepository
 {
     public Task<bool> IsEventOwnerAsync(int userId, int eventId, CancellationToken ct)
     {
@@ -57,6 +58,23 @@ public class EventRepository(AppDbContext context)  : IEventRepository
         existing.RegisteredAt ??= DateTime.UtcNow;
 
         ev.RegisteredUsers += 1;
+        string? email = await context.DomainUsers
+            .Where(u => u.Id == userId)
+            .Select(u => u.Email)
+            .FirstOrDefaultAsync(ct);
+
+        if (email is not null)
+        {
+            if (ev.NotificationSettings.HasFlag(NotificationSettings.WaitlistUpdates))
+            {
+                await emailSender.SendEmailAsync(new EmailData
+                {
+                    EmailToName = email,
+                    EmailSubject = $"You were in waillist for event {ev.Title} . You are accepted on event!",
+                    Message = "Yeyy you are accepted Congratulations )!."
+                });
+            }
+        }
 
         await context.SaveChangesAsync(ct);
     }
