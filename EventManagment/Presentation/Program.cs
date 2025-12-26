@@ -3,6 +3,7 @@ using Application.Mapping;
 using Application.Services.Abstractions;
 using Application.Services.Implementations;
 using Application.Extensions;
+using dotenv.net;
 using Infrastructure.BackGroundJobs;
 using Infrastructure.Mappings;
 using Infrastructure.Services;
@@ -15,6 +16,11 @@ using Presentation.Extensions;
 using Presentation.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
+
+DotEnv.Fluent()
+    .WithTrimValues()
+    .WithOverwriteExistingVars().WithProbeForEnv(6)
+    .Load();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSingleton<IOtpService, OtpService>();
 
@@ -28,12 +34,12 @@ DomainToEntityMappings.ConfigureMappings();
 IdentityErrorToApplicationMappings.ConfigureMappings();
 RequestsToDomain.ConfigureMappings();
 
-
+/*
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "redis:6379";
     options.InstanceName = "Otp_";
-});
+});*/
 builder.Services.AddApplicationServices();
 builder.Services.AddJwtBearerAuthentication(builder.Configuration);
 builder.Services.AddControllers();
